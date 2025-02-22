@@ -12,4 +12,5 @@ public class StatusTypeEntity
     [Column(TypeName = "nvarchar(50)")]
     public string StatusName { get; set; } = null!;
     public ICollection<ProjectEntity> Projects { get; set; } = [];
+    //One-to-many, one status can have many projects
 }

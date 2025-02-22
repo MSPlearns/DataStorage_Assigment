@@ -26,8 +26,8 @@ public class ProjectEntity
     public int StatusId { get; set; }
     public StatusTypeEntity Status { get; set; } = null!;
 
-    public int ProductId { get; set; }
-    public ProductEntity Product { get; set; } = null!;
+    public ICollection<ProductEntity> Products { get; set; } = [];
+    //One-to-many, one project can have many products
 
 }
 

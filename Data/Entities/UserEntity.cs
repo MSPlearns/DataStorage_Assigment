@@ -16,5 +16,6 @@ public class UserEntity
     public string Email { get; set; } = null!;
 
     public ICollection<ProjectEntity> Projects { get; set; } = [];
+    //One-to-many, one user can have many projects
 }
 
