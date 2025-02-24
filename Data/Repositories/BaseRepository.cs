@@ -7,9 +7,9 @@ using System.Linq.Expressions;
 namespace Data.Repositories;
 public abstract class BaseRepository<TEntity>(DataContext context) : IBaseRepository<TEntity> where TEntity : class
 {
-    private readonly DataContext _context = context;
+    protected readonly DataContext _context = context;
 
-    private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
+    protected readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
 
     //Create
 
@@ -32,17 +32,31 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
     }
 
     //Read
-    public async Task<IEnumerable<TEntity>> GetAllAsync()
+
+    //This method returns all entities of type TEntity.
+    //If an includeExpression is provided, it will be used to include related entities.
+    //If no entity is found, it will return an empty list.
+    //for example if I want to get all projects and include the customer entity, I can pass a lambda expression that includes the customer entity
+    public async Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeExpression = null)
     {
-        return await _dbSet.ToListAsync();
+        IQueryable<TEntity> query = _dbSet;
+        if (includeExpression != null)
+            query = includeExpression(query);
+
+        return await query.ToListAsync();
     }
 
-    public async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> expression)
+    //This method searches for an entity that matches the expression and returns it.
+    //If a includedExpression is provided, it will be used to include related entities.
+    //If the entity is not found, it will return null.
+    //for example if I search for a specific proyect by project id and add customer to the include expression, it will return the project with the customer entity
+    public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> expression, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeExpression = null)
     {
-        if (expression == null)
-            return null!;
+        IQueryable<TEntity> query = _dbSet;
+        if (includeExpression != null)
+            query = includeExpression(query);
 
-        return await _dbSet.FirstOrDefaultAsync(expression) ?? null!;
+        return await query.FirstOrDefaultAsync(expression);
     }
 
     //Update
@@ -95,4 +109,6 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
     {
         return await _dbSet.AnyAsync(expression);
     }
+
+
 }
