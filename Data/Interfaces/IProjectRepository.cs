@@ -1,13 +1,12 @@
 ﻿using Data.Entities;
 
-namespace Data.Interfaces
-{
-    internal interface IProjectRepository : IBaseRepository<ProjectEntity>
-    {
-        //TODO: Add custom methods here
-        //Note - be more specific about todo:s, i have no idea what custom method i wanted to add here
+namespace Data.Interfaces;
 
-        //Get all information with the ID
-        Task<ProjectEntity?> GetProjectByIdAsync(int projectId);
-    }
+public interface IProjectRepository : IBaseRepository<ProjectEntity>
+{
+    //TODO: Add custom methods here
+    //Note - be more specific about todo:s, i have no idea what custom method i wanted to add here
+
+    //Get all information with the ID
+    Task<ProjectEntity?> GetProjectByIdAsync(int projectId);
 }

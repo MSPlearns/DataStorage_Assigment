@@ -1,8 +1,7 @@
 ﻿using Data.Entities;
 
-namespace Data.Interfaces
+namespace Data.Interfaces;
+
+public interface IStatusTypeRepository : IBaseRepository<StatusTypeEntity>
 {
-    internal interface IStatusTypeRepository : IBaseRepository<StatusTypeEntity>
-    {
-    }
 }

@@ -1,8 +1,7 @@
 ﻿using Data.Entities;
 
-namespace Data.Interfaces
+namespace Data.Interfaces;
+
+public interface IProductRepository : IBaseRepository<ProductEntity>
 {
-    internal interface IProductRepository : IBaseRepository<ProductEntity>
-    {
-    }
 }

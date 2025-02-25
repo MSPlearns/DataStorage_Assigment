@@ -1,8 +1,7 @@
 ﻿using Data.Entities;
 
-namespace Data.Interfaces
+namespace Data.Interfaces;
+
+public interface IUserRepository : IBaseRepository<UserEntity>
 {
-    internal interface IUserRepository : IBaseRepository<UserEntity>
-    {
-    }
 }

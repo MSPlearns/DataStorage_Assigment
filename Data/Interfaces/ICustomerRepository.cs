@@ -1,7 +1,6 @@
 ﻿using Data.Entities;
-namespace Data.Interfaces
+namespace Data.Interfaces;
+
+public interface ICustomerRepository : IBaseRepository<CustomerEntity>
 {
-    internal interface ICustomerRepository : IBaseRepository<CustomerEntity>
-    {
-    }
 }
