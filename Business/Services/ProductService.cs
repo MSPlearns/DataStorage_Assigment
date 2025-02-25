@@ -1,32 +1,52 @@
-﻿using Domain.Dtos;
+﻿using Business.Mappers;
+using Data.Entities;
+using Data.Interfaces;
+using Domain.Dtos;
+using Domain.Factories;
 using Domain.Models;
 
 namespace Business.Services;
 
-public class ProductService : IProductService
+public class ProductService(IProductRepository productRepository, IProductFactory productFactory, IProductMapper productMapper) : IProductService
 {
-    public Task<bool> AddAsync(CreateProductForm form)
+    private readonly IProductRepository _productRepository = productRepository;
+    private readonly IProductFactory _productFactory = productFactory;
+    private readonly IProductMapper _productMapper = productMapper;
+    public async Task<bool?> AddAsync(CreateProductForm form)
     {
-        throw new NotImplementedException();
+        Product productModel = _productFactory.FromForm(form);
+        ProductEntity productEntity = _productMapper.ToEntity(productModel);
+        return await _productRepository.AddAsync(productEntity);
     }
 
-    public Task<bool?> DeleteAsync(int id)
+    public async Task<IEnumerable<Product>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        var result = await _productRepository.GetAllAsync();
+        return result.Select(x => _productMapper.ToModel(x));
     }
 
-    public Task<IEnumerable<Product>> GetAllAsync()
+    public async Task<Product?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        var result = await _productRepository.GetAsync(x => x.Id == id);
+        if (result == null)
+        {
+            return null;
+        }
+
+        Product product = _productMapper.ToModel(result);
+        return product;
     }
 
-    public Task<Product?> GetByIdAsync(int id)
+    public async Task<bool?> UpdateAsync(UpdateProductForm form, Product existingProduct)
     {
-        throw new NotImplementedException();
-    }
+        existingProduct.ProductName = form.ProductName;
+        existingProduct.Projects = form.Projects;
+        var updatedEntity = _productMapper.ToEntity(existingProduct);
 
-    public Task<Product?> UpdateAsync(int id, UpdateProductForm form)
+        return await _productRepository.UpdateAsync(x => x.Id == existingProduct.Id, updatedEntity);
+    }
+    public async Task<bool?> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        return await _productRepository.DeleteAsync(x => x.Id == id);
     }
 }

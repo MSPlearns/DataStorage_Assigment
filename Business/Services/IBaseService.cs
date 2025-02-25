@@ -6,8 +6,8 @@ public interface IBaseService<Tentity, TModel, TCreateForm, TUpdateForm>
     where TCreateForm : class
     where TUpdateForm : class
 {
-    Task<bool> AddAsync(TCreateForm form);
-    Task<TModel?> UpdateAsync(int id, TUpdateForm form);
+    Task<bool?> AddAsync(TCreateForm form);
+    Task<bool?> UpdateAsync(TUpdateForm form, TModel model);
     Task<IEnumerable<TModel>> GetAllAsync();
     Task<TModel?> GetByIdAsync(int id);
     Task<bool?> DeleteAsync(int id);

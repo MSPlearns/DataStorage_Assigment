@@ -13,7 +13,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
 
     //Create
 
-    public virtual async Task<TEntity> CreateAsync(TEntity entity)
+    public virtual async Task<bool?> AddAsync(TEntity entity)
     {
         if (entity == null)
             return null!;
@@ -22,12 +22,12 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         {
             await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
-            return entity;
+            return true;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error creating {nameof(TEntity)} entity:: {ex.Message}");
-            return null!;
+            return false;
         }
     }
 
@@ -61,29 +61,29 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
 
     //Update
 
-    public async Task<TEntity> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
+    public async Task<bool?> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
     {
         if (updatedEntity == null)
             return null!;
         try
         {
-            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression) ?? null!; //G
+            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression) ?? null!; 
             if (existingEntity == null)
                 return null!;
 
             _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
             await _context.SaveChangesAsync();
-            return existingEntity;
+            return true;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error updating {nameof(TEntity)} entity:: {ex.Message}");
-            return null!;
+            return false;
         }
     }
 
     //Delete
-    public async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> expression)
+    public async Task<bool?> DeleteAsync(Expression<Func<TEntity, bool>> expression)
     {
         if (expression == null)
             return false;
@@ -92,7 +92,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         {
             var existingEntity = await _dbSet.FirstOrDefaultAsync(expression) ?? null!;
             if (existingEntity == null)
-                return false;
+                return null;
 
             _dbSet.Remove(existingEntity);
             await _context.SaveChangesAsync();

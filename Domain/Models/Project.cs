@@ -13,9 +13,9 @@ public class Project
 
     public DateTime EndDate { get; set; }
 
-    public User User { get; set; } = null!;
+    public User AssociatedUser { get; set; } = null!;
 
-    public Customer Customer { get; set; } = null!;
+    public Customer AssociatedCustomer { get; set; } = null!;
 
     public string Status { get; set; } = null!;
 

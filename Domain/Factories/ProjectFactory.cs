@@ -2,7 +2,7 @@
 using Domain.Dtos;
 using Domain.Models;
 
-namespace Business.Factories;
+namespace Domain.Factories;
 public  class ProjectFactory : IProjectFactory
 {
      public Project FromForm(CreateProjectForm form)
@@ -13,18 +13,6 @@ public  class ProjectFactory : IProjectFactory
             Description = form.Description,
             StartDate = form.StartDate,
             EndDate = form.EndDate
-        };
-    }
-
-     public Project FromEntity(ProjectEntity entity)
-    {
-        return new Project()
-        {
-            Id = entity.Id,
-            Title = entity.Title,
-            Description = entity.Description,
-            StartDate = entity.StartDate,
-            EndDate = entity.EndDate
         };
     }
 }
