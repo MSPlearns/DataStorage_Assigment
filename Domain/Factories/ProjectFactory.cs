@@ -1,5 +1,4 @@
-﻿using Data.Entities;
-using Domain.Dtos;
+﻿using Domain.Dtos;
 using Domain.Models;
 
 namespace Domain.Factories;
@@ -12,7 +11,26 @@ public  class ProjectFactory : IProjectFactory
             Title = form.Title,
             Description = form.Description,
             StartDate = form.StartDate,
-            EndDate = form.EndDate
+            EndDate = form.EndDate,
+            AssociatedUser = form.AssociatedUser,
+            AssociatedCustomer = form.AssociatedCustomer,
+            Status = form.Status,
+            Products = form.Products
+        };
+    }
+
+    public Project FromForm(UpdateProjectForm form)
+    {
+        return new Project()
+        {
+            Title = form.Title,
+            Description = form.Description,
+            StartDate = form.StartDate,
+            EndDate = form.EndDate,
+            AssociatedUser = form.AssociatedUser,
+            AssociatedCustomer = form.AssociatedCustomer,
+            Status = form.Status,
+            Products = form.Products
         };
     }
 }

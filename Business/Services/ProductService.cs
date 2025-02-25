@@ -40,6 +40,7 @@ public class ProductService(IProductRepository productRepository, IProductFactor
     public async Task<bool?> UpdateAsync(UpdateProductForm form, Product existingProduct)
     {
         existingProduct.ProductName = form.ProductName;
+        existingProduct.Price = form.Price;
         existingProduct.Projects = form.Projects;
         var updatedEntity = _productMapper.ToEntity(existingProduct);
 

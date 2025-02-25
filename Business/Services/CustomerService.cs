@@ -39,7 +39,7 @@ public class CustomerService(ICustomerRepository customerRepository, ICustomerFa
         return customer;
     }
 
-    public async Task<Customer?> GetByName(string name)
+    public async Task<Customer?> GetByNameAsync(string name)
     {
         var result = await _customerRepository.GetAsync(x => x.CustomerName == name);
         if (result == null)

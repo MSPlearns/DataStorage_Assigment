@@ -4,6 +4,6 @@ using Domain.Models;
 
 namespace Business.Services;
 
-public interface IUserService : IBaseService<UserEntity, UserModel, CreateUserForm, UpdateUserForm>
+public interface IUserService : IBaseService<UserEntity, User, CreateUserForm, UpdateUserForm>
 {
 }

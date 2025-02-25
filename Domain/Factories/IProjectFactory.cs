@@ -4,6 +4,6 @@ using Domain.Models;
 
 namespace Domain.Factories;
 
-public interface IProjectFactory : IBaseFactory<Project, CreateProjectForm>
+public interface IProjectFactory : IBaseFactory<Project, CreateProjectForm, UpdateProjectForm>
 {
 }
