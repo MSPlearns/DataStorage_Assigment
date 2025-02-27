@@ -3,6 +3,6 @@ using Domain.Models;
 
 namespace Business.Mappers;
 
-public interface IProjectMapper : IBaseMapper<ProjectEntity, Project>
+public interface IProjectMapper : IBaseMapper<ProjectEntity, Project, ProjectReferenceModel>
 {
 }

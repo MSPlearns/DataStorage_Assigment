@@ -11,11 +11,11 @@ public class UpdateProjectForm
 
     public DateTime EndDate { get; set; }
 
-    public User AssociatedUser { get; set; } = null!;
+    public UserReferenceModel AssociatedUser { get; set; } = null!;
 
-    public Customer AssociatedCustomer { get; set; } = null!;
+    public CustomerReferenceModel AssociatedCustomer { get; set; } = null!;
 
     public string Status { get; set; } = null!;
 
-    public List<Product> Products { get; set; } = [];
+    public List<ProductReferenceModel> AssociatedProducts { get; set; } = [];
 }

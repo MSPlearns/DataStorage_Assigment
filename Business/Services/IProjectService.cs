@@ -4,6 +4,6 @@ using Domain.Models;
 
 namespace Business.Services;
 
-public interface IProjectService : IBaseService<ProjectEntity, Project, UpdateProjectForm>
+public interface IProjectService : IBaseService<ProjectEntity, Project, CreateProjectForm, UpdateProjectForm>
 {
 }

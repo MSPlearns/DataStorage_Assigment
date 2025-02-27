@@ -16,7 +16,7 @@ public class UserService(IUserRepository userRepository, IUserFactory userFactor
     public async Task<bool?> AddAsync(CreateUserForm form)
     {
         User userModel = _userFactory.FromForm(form);
-        UserEntity userEntity = _userMapper.ToEntity(userModel);
+        UserEntity userEntity = await _userMapper.ToEntity(userModel);
         return await _userRepository.AddAsync(userEntity);
     }
 
@@ -45,8 +45,8 @@ public class UserService(IUserRepository userRepository, IUserFactory userFactor
         existingUser.FirstName = form.FirstName;
         existingUser.LastName = form.LastName;
         existingUser.Email = form.Email;
-        existingUser.Projects = form.Projects;
-        var updatedEntity = _userMapper.ToEntity(existingUser);
+        existingUser.AssociatedProjects = form.AssociatedProjects;
+        var updatedEntity = await _userMapper.ToEntity(existingUser);
 
         return await _userRepository.UpdateAsync(x => x.Id == existingUser.Id, updatedEntity);
     }

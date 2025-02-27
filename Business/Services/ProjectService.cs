@@ -15,7 +15,7 @@ public class ProjectService(IProjectRepository projectRepository, IProjectFactor
     public async Task<bool?> AddAsync(CreateProjectForm form)
     {
         Project projectModel = _projectFactory.FromForm(form);
-        ProjectEntity projectEntity = _projectMapper.ToEntity(projectModel);
+        ProjectEntity projectEntity = await _projectMapper.ToEntity(projectModel);
         return await _projectRepository.AddAsync(projectEntity);
     }
 
@@ -57,8 +57,8 @@ public class ProjectService(IProjectRepository projectRepository, IProjectFactor
         existingProject.EndDate = form.EndDate;
         existingProject.AssociatedUser = form.AssociatedUser;
         existingProject.AssociatedCustomer = form.AssociatedCustomer;
-        existingProject.Products = form.Products;
-        var updatedEntity = _projectMapper.ToEntity(existingProject);
+        existingProject.AssociatedProducts = form.AssociatedProducts;
+        var updatedEntity = await _projectMapper.ToEntity(existingProject);
 
         return await _projectRepository.UpdateAsync(x => x.Id == existingProject.Id, updatedEntity);
     }

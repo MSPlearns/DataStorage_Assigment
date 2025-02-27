@@ -15,7 +15,7 @@ public  class ProjectFactory : IProjectFactory
             AssociatedUser = form.AssociatedUser,
             AssociatedCustomer = form.AssociatedCustomer,
             Status = form.Status,
-            Products = form.Products
+            AssociatedProducts = form.AssociatedProducts
         };
     }
 
@@ -30,7 +30,7 @@ public  class ProjectFactory : IProjectFactory
             AssociatedUser = form.AssociatedUser,
             AssociatedCustomer = form.AssociatedCustomer,
             Status = form.Status,
-            Products = form.Products
+            AssociatedProducts = form.AssociatedProducts
         };
     }
 }

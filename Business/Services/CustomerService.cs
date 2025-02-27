@@ -17,7 +17,7 @@ public class CustomerService(ICustomerRepository customerRepository, ICustomerFa
     public async Task<bool?> AddAsync(CreateCustomerForm form)
     {
         Customer customerModel = _customerFactory.FromForm(form);
-        CustomerEntity customerEntity= _customerMapper.ToEntity(customerModel);
+        CustomerEntity customerEntity= await _customerMapper.ToEntity(customerModel);
         return await _customerRepository.AddAsync(customerEntity); 
     }
 
@@ -55,8 +55,8 @@ public class CustomerService(ICustomerRepository customerRepository, ICustomerFa
     public async Task<bool?> UpdateAsync(UpdateCustomerForm form, Customer existingCustomer)
     {
         existingCustomer.CustomerName = form.CustomerName;
-        existingCustomer.Projects = form.Projects;
-        var updatedEntity = _customerMapper.ToEntity(existingCustomer);
+        existingCustomer.AssociatedProjects = form.AssociatedProjects;
+        var updatedEntity = await _customerMapper.ToEntity(existingCustomer);
 
         return await _customerRepository.UpdateAsync(x => x.Id == existingCustomer.Id, updatedEntity);
     }

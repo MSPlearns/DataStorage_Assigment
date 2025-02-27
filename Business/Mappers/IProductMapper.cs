@@ -3,6 +3,6 @@ using Domain.Models;
 
 namespace Business.Mappers;
 
-public interface IProductMapper : IBaseMapper<ProductEntity, Product>
+public interface IProductMapper : IBaseMapper<ProductEntity, Product, ProductReferenceModel>
 {
 }

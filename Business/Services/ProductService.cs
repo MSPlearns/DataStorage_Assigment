@@ -15,7 +15,7 @@ public class ProductService(IProductRepository productRepository, IProductFactor
     public async Task<bool?> AddAsync(CreateProductForm form)
     {
         Product productModel = _productFactory.FromForm(form);
-        ProductEntity productEntity = _productMapper.ToEntity(productModel);
+        ProductEntity productEntity = await _productMapper.ToEntity(productModel);
         return await _productRepository.AddAsync(productEntity);
     }
 
@@ -41,8 +41,8 @@ public class ProductService(IProductRepository productRepository, IProductFactor
     {
         existingProduct.ProductName = form.ProductName;
         existingProduct.Price = form.Price;
-        existingProduct.Projects = form.Projects;
-        var updatedEntity = _productMapper.ToEntity(existingProduct);
+        existingProduct.AssociatedProjects = form.AssociatedProjects;
+        var updatedEntity = await _productMapper.ToEntity(existingProduct);
 
         return await _productRepository.UpdateAsync(x => x.Id == existingProduct.Id, updatedEntity);
     }
