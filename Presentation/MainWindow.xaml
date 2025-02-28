@@ -1,0 +1,87 @@
+﻿<Window x:Class="Presentation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Presentation"
+        xmlns:viewmodels="clr-namespace:Presentation.ViewModels"
+        xmlns:views="clr-namespace:Presentation.Views"
+        d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        AllowsTransparency="True"
+        mc:Ignorable="d"
+        Title="Projesoft" Height="960" Width="1270">
+    <Border>
+        <Grid>
+            <ContentControl Content="{Binding CurrentViewModel}">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type viewmodels:CustomerDetailViewModel}">
+                        <views:CustomerDetailView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:CustomerEditViewModel}">
+                        <views:CustomerEditView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:CustomerListViewModel}">
+                        <views:CustomerListView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:CustomerNewViewModel}">
+                        <views:CustomerNewView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:ProductDetailViewModel}">
+                        <views:ProductDetailView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:ProductEditViewModel}">
+                        <views:ProductEditView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:ProductListViewModel}">
+                        <views:ProductListView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:ProductNewViewModel}">
+                        <views:ProductNewView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:ProjectDetailViewModel}">
+                        <views:ProjectDetailView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:ProjectEditViewModel}">
+                        <views:ProjectEditView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:ProjectListViewModel}">
+                        <views:ProjectListView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:ProjectNewViewModel}">
+                        <views:ProjectNewView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:UserDetailViewModel}">
+                        <views:UserDetailView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:UserEditViewModel}">
+                        <views:UserEditView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:UserListViewModel}">
+                        <views:UserListView/>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type viewmodels:UserNewViewModel}">
+                        <views:UserNewView/>
+                    </DataTemplate>
+
+                </ContentControl.Resources>
+            </ContentControl>   
+        </Grid>
+    </Border>
+</Window>
