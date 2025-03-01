@@ -33,12 +33,7 @@ public class ProjectRepository(DataContext context) : BaseRepository<ProjectEnti
 
         //Make sure to change the return type to ProjectModel when uncommenting the above code
 
-        return await _dbSet
-            .Include(x => x.Status)
-            .Include(x => x.Customer)
-            .Include(x => x.User)
-            .Include(x => x.Products)
-            .FirstOrDefaultAsync(x => x.Id == projectId);
+        return await _dbSet.FirstOrDefaultAsync(x => x.Id == projectId);
 
         //TODO: When Businnes and Presentation are implemented, implement the rest of EagerLoading in the service layer and the presentation layer
     }

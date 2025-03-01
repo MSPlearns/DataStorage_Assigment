@@ -9,12 +9,12 @@
         d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
         WindowStartupLocation="CenterScreen"
         Background="Transparent"
-        AllowsTransparency="True"
         mc:Ignorable="d"
-        Title="Projesoft" Height="960" Width="1270">
-    <Border>
+        Title="Projesoft" Height="960" Width="1260">
+    <Border Background="#333333" CornerRadius="10">
         <Grid>
-            <ContentControl Content="{Binding CurrentViewModel}">
+           
+            <ContentControl  Grid.Row="1" Margin="5" Content="{Binding CurrentViewModel}">
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type viewmodels:CustomerDetailViewModel}">
                         <views:CustomerDetailView/>

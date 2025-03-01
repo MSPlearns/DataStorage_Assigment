@@ -18,7 +18,7 @@ namespace Presentation.Views
     /// <summary>
     /// Interaction logic for ProjectEditView.xaml
     /// </summary>
-    public partial class ProjectEditView : Page
+    public partial class ProjectEditView : UserControl
     {
         public ProjectEditView()
         {

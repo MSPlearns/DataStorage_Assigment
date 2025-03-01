@@ -4,19 +4,15 @@ using Domain.Models;
 
 namespace Business.Mappers;
 
-public class CustomerMapper(IProjectMapper projectMapper, ICustomerService customerService) : ICustomerMapper
+public class CustomerMapper: ICustomerMapper
 {
-    private readonly IProjectMapper _projectMapper = projectMapper;
-    private readonly ICustomerService _customerService = customerService;
 
-    public async Task<CustomerEntity> ToEntity(Customer model)
+    public CustomerEntity ToEntity(Customer model, List<ProjectEntity> projectEntities)
     {
-        //The use of WhenAll was suggested by AI. It is used to execute multiple tasks concurrently and wait until they are completed before moving on.
-        var projects = await Task.WhenAll(model.AssociatedProjects.Select(p => _projectMapper.ToEntity(p)));
         CustomerEntity entity = new()
         {
             CustomerName = model.CustomerName,
-            Projects = projects.ToList()
+            Projects = projectEntities
         };
 
         if (model.Id != default)
@@ -25,24 +21,13 @@ public class CustomerMapper(IProjectMapper projectMapper, ICustomerService custo
         return entity;
     }
 
-    public async Task<CustomerEntity?> ToEntity(CustomerReferenceModel referenceModel)
-    {
-        Customer model = await _customerService.GetByIdAsync(referenceModel.Id);
-        if (model == null)
-        {
-            return null;
-        }
-        CustomerEntity entity = await ToEntity(model);
-        return entity;
-    }
-
-    public Customer ToModel(CustomerEntity entity)
+    public Customer ToModel(CustomerEntity entity, List<ProjectReferenceModel> projectReferences)
     {
         return new Customer
         {
             Id = entity.Id,
             CustomerName = entity.CustomerName,
-            AssociatedProjects = entity.Projects.Select(_projectMapper.ToReferenceModel).ToList()
+            AssociatedProjects = projectReferences
         };
     }
 

@@ -18,7 +18,7 @@ namespace Presentation.Views
     /// <summary>
     /// Interaction logic for ProjectNewView.xaml
     /// </summary>
-    public partial class ProjectNewView : Page
+    public partial class ProjectNewView : UserControl
     {
         public ProjectNewView()
         {

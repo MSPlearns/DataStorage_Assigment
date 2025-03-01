@@ -1,4 +1,4 @@
-﻿<Page x:Class="Presentation.Views.UserDetailView"
+﻿<UserControl x:Class="Presentation.Views.UserDetailView"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,10 +7,26 @@
       xmlns:viewmodels="clr-namespace:Presentation.ViewModels"
       d:DataContext="{d:DesignInstance Type=viewmodels:UserDetailViewModel}"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="UserDetailView">
+      d:DesignHeight="900" d:DesignWidth="1260" >
 
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="TopBar" Grid.Row="0" Background="Transparent" Margin="15 0 7.5 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Content="Projects" Grid.Column="0" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProjectListCommand}"/>
+            <Button Content="Products" Grid.Column="1" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProductListCommand}"/>
+            <Button Content="Customers" Grid.Column="2" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerListCommand}"/>
+            <Button Content="Users" Grid.Column="3" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToUserListCommand}"/>
+        </Grid>
     </Grid>
-</Page>
+</UserControl>

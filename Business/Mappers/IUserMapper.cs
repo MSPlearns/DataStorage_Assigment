@@ -3,6 +3,6 @@ using Domain.Models;
 
 namespace Business.Mappers;
 
-public interface IUserMapper : IBaseMapper<UserEntity, User, UserReferenceModel>
+public interface IUserMapper : IBaseMapper<UserEntity, User, UserReferenceModel, ProjectEntity, ProjectReferenceModel>
 {
 }

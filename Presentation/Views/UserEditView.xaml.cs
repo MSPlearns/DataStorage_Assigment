@@ -18,7 +18,7 @@ namespace Presentation.Views
     /// <summary>
     /// Interaction logic for UserUpdateView.xaml
     /// </summary>
-    public partial class UserEditView : Page
+    public partial class UserEditView : UserControl
     {
         public UserEditView()
         {

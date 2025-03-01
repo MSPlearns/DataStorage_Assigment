@@ -16,7 +16,7 @@ public class ProjectEntity
     public DateTime StartDate { get; set; } = DateTime.Now;
 
     [Column(TypeName = "Date")]
-    public DateTime EndDate { get; set; }
+    public DateTime? EndDate { get; set; }
 
     public int UserId { get; set; }
     public UserEntity User { get; set; } = null!;

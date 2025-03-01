@@ -18,7 +18,7 @@ namespace Presentation.Views
     /// <summary>
     /// Interaction logic for ProjectListView.xaml
     /// </summary>
-    public partial class ProjectListView : Page
+    public partial class ProjectListView : UserControl
     {
         public ProjectListView()
         {

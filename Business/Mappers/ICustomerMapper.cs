@@ -2,7 +2,7 @@
 using Domain.Models;
 
 namespace Business.Mappers;
-public interface ICustomerMapper : IBaseMapper<CustomerEntity, Customer, CustomerReferenceModel>
+public interface ICustomerMapper : IBaseMapper<CustomerEntity, Customer, CustomerReferenceModel, ProjectEntity, ProjectReferenceModel>
 {
 
 }

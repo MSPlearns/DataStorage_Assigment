@@ -8,24 +8,34 @@ using Domain.Models;
 
 namespace Business.Services;
 
-public class UserService(IUserRepository userRepository, IUserFactory userFactory, IUserMapper userMapper) : IUserService
+public class UserService(IUserRepository userRepository, IUserFactory userFactory, IUserMapper userMapper, IProjectRepository projectRepository, IProjectMapper projectMapper) : IUserService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserFactory _userFactory = userFactory;
     private readonly IUserMapper _userMapper = userMapper;
+    private readonly IProjectRepository _projectRepository = projectRepository;
+    private readonly IProjectMapper _projectMapper = projectMapper;
     public async Task<bool?> AddAsync(CreateUserForm form)
     {
         User userModel = _userFactory.FromForm(form);
-        UserEntity userEntity = await _userMapper.ToEntity(userModel);
+
+        List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(userModel);
+
+        UserEntity userEntity = _userMapper.ToEntity(userModel, projects);
         return await _userRepository.AddAsync(userEntity);
     }
 
 
-
     public async Task<IEnumerable<User>> GetAllAsync()
-    {
+    { 
+        List<User> userList = [];
         var result = await _userRepository.GetAllAsync();
-        return result.Select(x => _userMapper.ToModel(x));
+        foreach (var userEntity in result)
+        {
+            List<ProjectReferenceModel> associatedProjectsReferences = TransformEntitiesToReferenceModels(userEntity.Projects);
+            userList.Add(_userMapper.ToModel(userEntity, associatedProjectsReferences));
+        }
+        return userList;
     }
 
     public async Task<User?> GetByIdAsync(int id)
@@ -35,8 +45,8 @@ public class UserService(IUserRepository userRepository, IUserFactory userFactor
         {
             return null;
         }
-
-        User user = _userMapper.ToModel(result);
+        List<ProjectReferenceModel> associatedProjectsReferences = TransformEntitiesToReferenceModels(result.Projects);
+        User user = _userMapper.ToModel(result, associatedProjectsReferences);
         return user;
     }
 
@@ -46,7 +56,8 @@ public class UserService(IUserRepository userRepository, IUserFactory userFactor
         existingUser.LastName = form.LastName;
         existingUser.Email = form.Email;
         existingUser.AssociatedProjects = form.AssociatedProjects;
-        var updatedEntity = await _userMapper.ToEntity(existingUser);
+        List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(existingUser);
+        var updatedEntity =  _userMapper.ToEntity(existingUser, projects);
 
         return await _userRepository.UpdateAsync(x => x.Id == existingUser.Id, updatedEntity);
     }
@@ -54,5 +65,31 @@ public class UserService(IUserRepository userRepository, IUserFactory userFactor
     public async Task<bool?> DeleteAsync(int id)
     {
         return await _userRepository.DeleteAsync(x => x.Id == id);
+    }
+
+    private async Task<List<ProjectEntity>> GetAssociatedEntitiesAsync(User userModel)
+    {
+        List<ProjectEntity> projects = [];
+        foreach (var project in userModel.AssociatedProjects)
+        {
+            ProjectEntity projectEntity = await _projectRepository.GetProjectByIdAsync(project.Id);
+            if (projectEntity != null)
+            {
+                projects.Add(projectEntity);
+            }
+        }
+
+        return projects;
+    }
+
+    private List<ProjectReferenceModel> TransformEntitiesToReferenceModels(ICollection<ProjectEntity> projectEntities)
+    {
+        List<ProjectReferenceModel> projects = [];
+        foreach (var project in projectEntities)
+        {
+            projects.Add(_projectMapper.ToReferenceModel(project));
+        }
+
+        return projects;
     }
 }

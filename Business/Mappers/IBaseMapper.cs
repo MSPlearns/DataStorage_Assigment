@@ -1,13 +1,14 @@
 ﻿namespace Business.Mappers;
 
-public interface IBaseMapper<Tentity, TModel, TReferenceModel>
+public interface IBaseMapper<Tentity, TModel, TReferenceModel, TSecondaryEntity, TSecondaryReference>
     where Tentity : class
     where TModel : class
+    where TSecondaryEntity : class
     where TReferenceModel : class
+    where TSecondaryReference : class
 
 {
-    Task<Tentity> ToEntity(TModel model);
-    Task<Tentity?> ToEntity(TReferenceModel referenceModel);
-    TModel ToModel(Tentity entity);
+    Tentity ToEntity(TModel model, List<TSecondaryEntity> entities);
+    TModel ToModel(Tentity entity, List<TSecondaryReference> secondaryReferences);
     TReferenceModel ToReferenceModel(Tentity entity);
 }

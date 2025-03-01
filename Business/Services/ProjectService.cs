@@ -6,46 +6,59 @@ using Domain.Factories;
 using Domain.Models;
 namespace Business.Services;
 
-public class ProjectService(IProjectRepository projectRepository, IProjectFactory projectFactory, IProjectMapper projectMapper) : IProjectService
+public class ProjectService(IProjectRepository projectRepository, IProjectFactory projectFactory, IProjectMapper projectMapper, IProductRepository productRepository, IProductMapper productMapper) : IProjectService
 {
     private readonly IProjectRepository _projectRepository = projectRepository;
     private readonly IProjectFactory _projectFactory = projectFactory;
     private readonly IProjectMapper _projectMapper = projectMapper;
+    private readonly IProductRepository _productRepository = productRepository;
+    private readonly IProductMapper _productMapper = productMapper;
 
     public async Task<bool?> AddAsync(CreateProjectForm form)
     {
         Project projectModel = _projectFactory.FromForm(form);
-        ProjectEntity projectEntity = await _projectMapper.ToEntity(projectModel);
+
+        List<ProductEntity> products = await GetAssociatedEntitiesAsync(projectModel);
+
+        ProjectEntity projectEntity = _projectMapper.ToEntity(projectModel, products);
         return await _projectRepository.AddAsync(projectEntity);
     }
 
+
+
     public async Task<IEnumerable<Project>> GetAllAsync()
     {
+        List<Project> projectList = [];
         var result = await _projectRepository.GetAllAsync();
-        return result.Select(x => _projectMapper.ToModel(x));
+        foreach (var projectEntity in result)
+        {
+            List<ProductReferenceModel> associatedProductsReferences = TransformEntitesToReferenceModels(projectEntity.Products);
+            projectList.Add(_projectMapper.ToModel(projectEntity, associatedProductsReferences));
+        }
+        return projectList;
     }
 
     public async Task<Project?> GetByIdAsync(int id)
     {
-        var result = await _projectRepository.GetAsync(x => x.Id == id);
-        if (result == null)
+        ProjectEntity? projectEntity = await _projectRepository.GetAsync(x => x.Id == id);
+        if (projectEntity == null)
         {
             return null;
         }
-
-        Project project = _projectMapper.ToModel(result);
+        List<ProductReferenceModel> associatedProductsReferences = TransformEntitesToReferenceModels(projectEntity.Products);
+        Project project = _projectMapper.ToModel(projectEntity, associatedProductsReferences);
         return project;
     }
 
     public async Task<Project?> GetByTitleAsync(string title)
     {
-        var result = await _projectRepository.GetAsync(x => x.Title == title);
-        if (result == null)
+        ProjectEntity? projectEntity = await _projectRepository.GetAsync(x => x.Title == title);
+        if (projectEntity == null)
         {
             return null;
         }
-
-        Project project = _projectMapper.ToModel(result);
+        List<ProductReferenceModel> associatedProductsReferences = TransformEntitesToReferenceModels(projectEntity.Products);
+        Project project = _projectMapper.ToModel(projectEntity, associatedProductsReferences);
         return project;
     }
 
@@ -58,7 +71,11 @@ public class ProjectService(IProjectRepository projectRepository, IProjectFactor
         existingProject.AssociatedUser = form.AssociatedUser;
         existingProject.AssociatedCustomer = form.AssociatedCustomer;
         existingProject.AssociatedProducts = form.AssociatedProducts;
-        var updatedEntity = await _projectMapper.ToEntity(existingProject);
+
+        List<ProductEntity> products = await GetAssociatedEntitiesAsync(existingProject);
+
+
+        var updatedEntity = _projectMapper.ToEntity(existingProject, products);
 
         return await _projectRepository.UpdateAsync(x => x.Id == existingProject.Id, updatedEntity);
     }
@@ -66,5 +83,31 @@ public class ProjectService(IProjectRepository projectRepository, IProjectFactor
     public async Task<bool?> DeleteAsync(int id)
     {
         return await _projectRepository.DeleteAsync(x => x.Id == id);
+    }
+
+    private async Task<List<ProductEntity>> GetAssociatedEntitiesAsync(Project projectModel)
+    {
+        List<ProductEntity> products = [];
+        foreach (var product in projectModel.AssociatedProducts)
+        {
+            ProductEntity productEntity = await _productRepository.GetProductByIdAsync(product.Id);
+            if (productEntity != null)
+            {
+                products.Add(productEntity);
+            }
+        }
+
+        return products;
+    }
+
+    private List<ProductReferenceModel> TransformEntitesToReferenceModels(ICollection<ProductEntity> productEntities)
+    {
+        List<ProductReferenceModel> products = [];
+        foreach (var product in productEntities)
+        {
+            products.Add(_productMapper.ToReferenceModel(product));
+        }
+
+        return products;
     }
 }

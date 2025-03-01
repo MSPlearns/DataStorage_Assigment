@@ -18,7 +18,7 @@ namespace Presentation.Views
     /// <summary>
     /// Interaction logic for CustomerUpdateView.xaml
     /// </summary>
-    public partial class CustomerNewView : Page
+    public partial class CustomerNewView : UserControl
     {
         public CustomerNewView()
         {
