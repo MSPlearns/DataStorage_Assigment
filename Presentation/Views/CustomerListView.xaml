@@ -36,26 +36,30 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Button Grid.Row="0" Content="New Customer" Style="{StaticResource NavigationButtonStyle}" />
+                <Button Grid.Row="0" Content="New Customer" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerNewCommand}" />
 
 
-                <ListView  Grid.Row="1" ItemsSource="{Binding Customers}" Margin="0 20 0 0" HorizontalContentAlignment="Stretch"
-                            Style="{StaticResource ListViewStyle}">
+                <ListView Grid.Row="1" ItemsSource="{Binding Customers}" Margin="0 20 0 0" HorizontalContentAlignment="Stretch"
+          Style="{StaticResource ListViewStyle}">
                     <ListView.ItemTemplate>
                         <DataTemplate DataType="models:Contact">
-                            <Grid>
+                            <!-- Make the Grid stretch and fill the whole item -->
+                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <!-- Allow full width of the item -->
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding CustomerName}" Style="{StaticResource ListCustomerNameText}"/>
 
+                                <!-- Bind the EventTrigger to the whole Grid -->
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseLeftButtonUp">
                                         <i:InvokeCommandAction Command="{Binding DataContext.GoToCustomerDetailCommand, 
-                                            RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding .}"/>
+                            RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding .}"/>
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
 
+                                <!-- Content inside the Grid (now the whole grid is clickable) -->
+                                <TextBlock Grid.Column="0" Text="{Binding CustomerName}" Style="{StaticResource ListCustomerNameText}"/>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>

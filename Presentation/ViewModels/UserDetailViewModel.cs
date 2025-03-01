@@ -1,18 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Presentation.ViewModels;
 
-public partial class UserDetailViewModel : ObservableObject
+public partial class UserDetailViewModel(IServiceProvider serviceProvider) : ObservableObject
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public UserDetailViewModel(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    [ObservableProperty]
+    private User _currentUser = new();
 
     [RelayCommand]
 

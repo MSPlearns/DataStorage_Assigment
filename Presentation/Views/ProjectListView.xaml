@@ -3,30 +3,67 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:local="clr-namespace:Presentation.Views"
             xmlns:viewmodels="clr-namespace:Presentation.ViewModels"
       d:DataContext="{d:DesignInstance Type=viewmodels:ProjectListViewModel}"
       mc:Ignorable="d" 
       d:DesignHeight="900" d:DesignWidth="1260">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Border Background="#333335" CornerRadius="0 0 10 10" Padding="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <Grid x:Name="TopBar" Grid.Row="0" Background="Transparent" Margin="15 0 7.5 0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <Grid x:Name="TopBar" Grid.Row="0" Background="Transparent" Margin="15 0 7.5 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <Button Content="Projects" Grid.Column="0" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProjectListCommand}"/>
-            <Button Content="Products" Grid.Column="1" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProductListCommand}"/>
-            <Button Content="Customers" Grid.Column="2" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerListCommand}"/>
-            <Button Content="Users" Grid.Column="3" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToUserListCommand}"/>
+                <Button Content="Projects" Grid.Column="0" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProjectListCommand}"/>
+                <Button Content="Products" Grid.Column="1" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProductListCommand}"/>
+                <Button Content="Customers" Grid.Column="2" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerListCommand}"/>
+                <Button Content="Users" Grid.Column="3" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToUserListCommand}"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Button Grid.Row="0" Content="New Project" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProjectNewCommand}" />
+
+
+                <ListView  Grid.Row="1" ItemsSource="{Binding Projects}" Margin="0 20 0 0" HorizontalContentAlignment="Stretch"
+                     Style="{StaticResource ListViewStyle}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate DataType="models:Contact">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Title}" Style="{StaticResource ListCustomerNameText}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Status}" Style="{StaticResource ListCustomerNameText}"/>
+
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                                        <i:InvokeCommandAction Command="{Binding DataContext.GoToProjectDetailCommand, 
+                                     RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding .}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </UserControl>

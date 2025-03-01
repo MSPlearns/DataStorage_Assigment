@@ -9,24 +9,68 @@
       mc:Ignorable="d" 
       d:DesignHeight="960" d:DesignWidth="1260">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Border Background="#333335" CornerRadius="0 0 10 10" Padding="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <Grid x:Name="TopBar" Grid.Row="0" Background="Transparent" Margin="15 0 7.5 0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <Grid x:Name="TopBar" Grid.Row="0" Background="Transparent" Margin="15 0 7.5 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <Button Content="Projects" Grid.Column="0" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProjectListCommand}"/>
-            <Button Content="Products" Grid.Column="1" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProductListCommand}"/>
-            <Button Content="Customers" Grid.Column="2" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerListCommand}"/>
-            <Button Content="Users" Grid.Column="3" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToUserListCommand}"/>
+                <Button Content="Projects" Grid.Column="0" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProjectListCommand}"/>
+                <Button Content="Products" Grid.Column="1" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProductListCommand}"/>
+                <Button Content="Customers" Grid.Column="2" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerListCommand}"/>
+                <Button Content="Users" Grid.Column="3" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToUserListCommand}"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Customer Details" FontSize="34" Foreground="White" TextAlignment="Center"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Name" FontSize="26" Foreground="White" Margin="10"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding CurrentCustomer.CustomerName}" FontSize="26" Foreground="White" Margin="10"/>
+
+
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="Associated Projects" FontSize="26" Foreground="White" Margin="10"/>
+
+                <ListView Grid.Row="2" Grid.Column="1" ItemsSource="{Binding CurrentCustomer.AssociatedProjects}" Margin="0 20 0 0" HorizontalContentAlignment="Stretch"
+                         Style="{StaticResource ListViewStyle}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate DataType="models:Contact">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"   Text="{Binding Title}" Style="{StaticResource ListCustomerNameText}"/>
+                                <TextBlock Grid.Column="1"   Text="{Binding Status}" Style="{StaticResource ListCustomerNameText}"/>
+
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <Button Grid.Row="3" Grid.Column="0" Content="Edit" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerEditCommand}" />
+                <Button Grid.Row="4" Grid.Column="1" Content="Delete" Style="{StaticResource NavigationButtonStyle}" Command="{Binding DeleteCustomerCommand}" />
+
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </UserControl>

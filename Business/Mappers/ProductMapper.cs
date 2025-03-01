@@ -41,4 +41,14 @@ public class ProductMapper : IProductMapper
             Price = entity.Price,
         };
     }
+
+    public ProductReferenceModel ToReferenceModel(Product model)
+    {
+        return new ProductReferenceModel
+        {
+            Id = model.Id,
+            ProductName = model.ProductName,
+            Price = model.Price,
+        };
+    }
 }

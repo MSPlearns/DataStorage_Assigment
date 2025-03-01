@@ -41,6 +41,17 @@ public class UserMapper : IUserMapper
         {
             Id = entity.Id,
             FullName = $"{entity.FirstName} {entity.LastName}",
+            Email = entity.Email,
+        };
+    }
+
+    public UserReferenceModel ToReferenceModel(User model)
+    {
+        return new UserReferenceModel
+        {
+            Id = model.Id,
+            FullName = $"{model.FirstName} {model.LastName}",
+            Email = model.Email,
         };
     }
 }

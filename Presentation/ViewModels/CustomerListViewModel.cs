@@ -12,37 +12,49 @@ public partial class CustomerListViewModel : ObservableObject
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ICustomerService _customerService;
+    private readonly ICustomerMapper _customerMapper;
 
 
     [ObservableProperty]
-    private ObservableCollection<Customer> _customers = [];
+    private ObservableCollection<CustomerReferenceModel> _customers = [];
 
     [ObservableProperty]
     private Customer _selectedCustomer = null!;
 
-    public CustomerListViewModel(IServiceProvider serviceProvider, ICustomerService customerService)
+    public CustomerListViewModel(IServiceProvider serviceProvider, ICustomerService customerService, ICustomerMapper customerMapper)
     {
         _serviceProvider = serviceProvider;
         _customerService = customerService;
-        Task.Run(() => LoadCustomers());
+        _customerMapper = customerMapper;
+        LoadCustomers();
 
     }
 
     public async Task LoadCustomers()
     {
         var customers = await _customerService.GetAllAsync();
-        Customers = new ObservableCollection<Customer>(customers);
+        foreach (var customer in customers)
+        {
+            CustomerReferenceModel customerReference = _customerMapper.ToReferenceModel(customer);
+            Customers.Add(customerReference);
+        }
     }
 
     [RelayCommand]
-    public void GoToCustomerDetail()
+    public async Task GoToCustomerDetail(CustomerReferenceModel selectedCustomerReference)
     {
+        var customerService = _serviceProvider.GetRequiredService<ICustomerService>();
+        var selectedCustomerModel = await customerService.GetByIdAsync(selectedCustomerReference.Id);
+
+        var customerDetailViewModel = _serviceProvider.GetRequiredService<CustomerDetailViewModel>();
+        customerDetailViewModel.CurrentCustomer = selectedCustomerModel;
+
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-        mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<CustomerDetailViewModel>();
+        mainViewModel.CurrentViewModel = customerDetailViewModel;
     }
 
     [RelayCommand]
-    public void GoToCustomérNew()
+    public void GoToCustomerNew()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<CustomerNewViewModel>();

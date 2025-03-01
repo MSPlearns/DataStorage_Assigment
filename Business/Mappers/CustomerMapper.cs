@@ -4,7 +4,7 @@ using Domain.Models;
 
 namespace Business.Mappers;
 
-public class CustomerMapper: ICustomerMapper
+public class CustomerMapper : ICustomerMapper
 {
 
     public CustomerEntity ToEntity(Customer model, List<ProjectEntity> projectEntities)
@@ -39,4 +39,15 @@ public class CustomerMapper: ICustomerMapper
             CustomerName = entity.CustomerName
         };
     }
+
+    public CustomerReferenceModel ToReferenceModel(Customer model)
+    {
+        return new CustomerReferenceModel
+        {
+            Id = model.Id,
+            CustomerName = model.CustomerName
+        };
+    }
+
+
 }

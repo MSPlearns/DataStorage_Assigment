@@ -10,7 +10,6 @@ public class CustomerFactory : ICustomerFactory
         return new Customer
         {
             CustomerName = form.CustomerName,
-            AssociatedProjects = form.AssociatedProjects
         };
     }
 
@@ -19,7 +18,6 @@ public class CustomerFactory : ICustomerFactory
         return new Customer
         {
             CustomerName = form.CustomerName,
-            AssociatedProjects = form.AssociatedProjects
         };
 
     }

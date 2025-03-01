@@ -11,4 +11,5 @@ public interface IBaseMapper<Tentity, TModel, TReferenceModel, TSecondaryEntity,
     Tentity ToEntity(TModel model, List<TSecondaryEntity> entities);
     TModel ToModel(Tentity entity, List<TSecondaryReference> secondaryReferences);
     TReferenceModel ToReferenceModel(Tentity entity);
+    TReferenceModel ToReferenceModel(TModel model);
 }

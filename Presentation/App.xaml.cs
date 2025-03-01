@@ -31,6 +31,7 @@ public partial class App : Application
 
 
                 services.AddTransient<ICustomerRepository, CustomerRepository>();
+                services.AddTransient<IStatusTypeRepository, StatusTypeRepository>();
                 services.AddTransient<IProjectRepository, ProjectRepository>();
                 services.AddTransient<IUserRepository, UserRepository>();
                 services.AddTransient<IProductRepository, ProductRepository>();

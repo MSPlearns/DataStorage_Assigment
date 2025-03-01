@@ -4,6 +4,7 @@ using Data.Interfaces;
 using Domain.Dtos;
 using Domain.Factories;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Business.Services;
@@ -12,7 +13,9 @@ public class CustomerService(ICustomerRepository customerRepository,
                              ICustomerFactory customerFactory, 
                              ICustomerMapper customerMapper, 
                              IProjectRepository projectRepository,
-                             IProjectMapper projectMapper) : ICustomerService
+                             IProjectMapper projectMapper,
+                             IStatusTypeRepository statusTypeRepository) : ICustomerService
+                             
 {
     private readonly ICustomerRepository _customerRepository = customerRepository;
     private readonly IProjectRepository _projectRepository = projectRepository;
@@ -25,7 +28,6 @@ public class CustomerService(ICustomerRepository customerRepository,
         Customer customerModel = _customerFactory.FromForm(form);
 
         List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(customerModel);
-
         CustomerEntity customerEntity = _customerMapper.ToEntity(customerModel, projects);
         return await _customerRepository.AddAsync(customerEntity);
     }
@@ -35,7 +37,10 @@ public class CustomerService(ICustomerRepository customerRepository,
     public async Task<IEnumerable<Customer>> GetAllAsync()
     {
         List<Customer> customerList = [];
-        var result = await _customerRepository.GetAllAsync();
+        var result = await _customerRepository.GetAllAsync(query => query
+        .Include(c => c.Projects)
+        .ThenInclude(p => p.Status)
+        );
         foreach (var customerEntity in result)
         {
             List<ProjectReferenceModel> associatedProjectsReferences = TransformEntitiesToReferenceModels(customerEntity.Projects);
@@ -46,7 +51,13 @@ public class CustomerService(ICustomerRepository customerRepository,
 
     public async Task<Customer?> GetByIdAsync(int id)
     {
-        CustomerEntity? customerEntity = await _customerRepository.GetAsync(x => x.Id == id);
+        CustomerEntity? customerEntity = await _customerRepository.GetAsync(
+        x => x.Id == id,
+         query => query
+        .Include(c => c.Projects)
+        .ThenInclude(p => p.Status)
+       
+    );
         if (customerEntity == null)
         {
             return null;
@@ -59,7 +70,7 @@ public class CustomerService(ICustomerRepository customerRepository,
     public async Task<bool?> UpdateAsync(UpdateCustomerForm form, Customer existingCustomer)
     {
         existingCustomer.CustomerName = form.CustomerName;
-        existingCustomer.AssociatedProjects = form.AssociatedProjects;
+
        List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(existingCustomer);
 
         var updatedEntity = _customerMapper.ToEntity(existingCustomer, projects);
