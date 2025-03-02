@@ -32,7 +32,10 @@ public partial class UserDetailViewModel(IServiceProvider serviceProvider) : Obs
     public void GoToUserEdit()
     {
         var userEditViewModel = _serviceProvider.GetRequiredService<UserEditViewModel>();
-        //userEditViewModel.CurrentUser = CurrentUser;
+        userEditViewModel.CurrentUser = CurrentUser;
+        userEditViewModel.UpUserForm.FirstName = CurrentUser.FirstName;
+        userEditViewModel.UpUserForm.LastName = CurrentUser.LastName;
+        userEditViewModel.UpUserForm.Email = CurrentUser.Email;
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = userEditViewModel;
     }

@@ -7,26 +7,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Presentation.ViewModels;
 
-public partial class CustomerEditViewModel : ObservableObject
+public partial class CustomerEditViewModel(IServiceProvider serviceProvider) : ObservableObject
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     [ObservableProperty]
     private Customer _currentCustomer = new();
 
     [ObservableProperty]
-    private string _errorMessage;
+    private string _errorMessage= "";
 
     [ObservableProperty]
-    private UpdateCustomerForm _upCustomerForm = new();
-
-    public CustomerEditViewModel(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-        _errorMessage = "";
-        _upCustomerForm.CustomerName = CurrentCustomer.CustomerName;
-    }
-
+    private UpdateCustomerForm _upCustomerForm= new();
 
     [RelayCommand]
     public void Cancel()

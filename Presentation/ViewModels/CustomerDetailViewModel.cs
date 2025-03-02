@@ -34,6 +34,7 @@ public partial class CustomerDetailViewModel(IServiceProvider serviceProvider) :
     {
         var customerEditViewModel = _serviceProvider.GetRequiredService<CustomerEditViewModel>();
         customerEditViewModel.CurrentCustomer = CurrentCustomer;
+        customerEditViewModel.UpCustomerForm.CustomerName = CurrentCustomer.CustomerName;
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = customerEditViewModel;
     }

@@ -1,6 +1,7 @@
 ﻿using Business.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Domain.Dtos;
 using Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,11 +36,26 @@ public partial class ProjectDetailViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void GoToProjectEdit()
+    public async Task GoToProjectEdit()
     {
         var projectEditViewModel = _serviceProvider.GetRequiredService<ProjectEditViewModel>();
-        //projectEditViewModel.CurrentProject = CurrentProject;
+        projectEditViewModel.CurrentProject = CurrentProject;
+
+        projectEditViewModel.UpProjectForm = new UpdateProjectForm
+        {
+            Title = CurrentProject.Title,
+            Description = CurrentProject.Description,
+            //AssociatedProducts = CurrentProject.AssociatedProducts,
+            StartDate = CurrentProject.StartDate,
+            EndDate = CurrentProject.EndDate,
+            AssociatedUser = CurrentProject.AssociatedUser,
+            AssociatedCustomer = CurrentProject.AssociatedCustomer,
+            Status = CurrentProject.Status
+        };
+
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+
+        //await projectEditViewModel.UpdateIsSelectedInAvailableProductsAsync();
         mainViewModel.CurrentViewModel = projectEditViewModel;
     }
 

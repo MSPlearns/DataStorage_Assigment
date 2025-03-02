@@ -9,4 +9,5 @@ public interface IProjectRepository : IBaseRepository<ProjectEntity>
 
     //Get all information with the ID
     Task<ProjectEntity?> GetProjectByIdAsync(int projectId);
+    Task<bool?> UpdateAsyncc(ProjectEntity updatedEntity, List<ProductEntity> propjects);
 }

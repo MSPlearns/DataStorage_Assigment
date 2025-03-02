@@ -37,7 +37,9 @@ public partial class ProductDetailViewModel : ObservableObject
     public void GoToProductEdit()
     {
         var productEditViewModel = _serviceProvider.GetRequiredService<ProductEditViewModel>();
-        //productEditViewModel.CurrentProduct = CurrentProduct;
+        productEditViewModel.CurrentProduct = CurrentProduct;
+        productEditViewModel.UpProductForm.ProductName = CurrentProduct.ProductName;
+        productEditViewModel.UpProductForm.Price = CurrentProduct.Price;
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = productEditViewModel;
     }

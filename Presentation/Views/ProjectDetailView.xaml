@@ -48,9 +48,9 @@
                     <TextBlock  Text="Description" FontSize="20" Foreground="White" Margin="10"/>
                     <TextBlock  Text="{Binding CurrentProject.Description}" FontSize="18" Foreground="White" Margin="10"/>
                     <TextBlock  Text="Ordering customer" FontSize="24" Foreground="White" Margin="10"/>
-                    <TextBlock  Text="{Binding CurrentProject.AssociatedCustomer}" FontSize="20" Foreground="White" Margin="10"/>
+                    <TextBlock  Text="{Binding CurrentProject.AssociatedCustomer.CustomerName}" FontSize="20" Foreground="White" Margin="10"/>
                     <TextBlock  Text="Responsible employee" FontSize="24" Foreground="White" Margin="10"/>
-                    <TextBlock  Text="{Binding CurrentProject.AssociatedUser}" FontSize="20" Foreground="White" Margin="10"/>
+                    <TextBlock  Text="{Binding CurrentProject.AssociatedUser.FullName}" FontSize="20" Foreground="White" Margin="10"/>
                     <TextBlock  Text="Current status" FontSize="24" Foreground="White" Margin="10"/>
                     <TextBlock  Text="{Binding CurrentProject.Status}" FontSize="20" Foreground="White" Margin="10"/>
                     <TextBlock  Text="Start Date" FontSize="18" Foreground="White" Margin="10"/>

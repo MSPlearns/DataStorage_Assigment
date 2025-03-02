@@ -24,13 +24,13 @@ public partial class UserNewViewModel(IServiceProvider serviceProvider) : Observ
     [RelayCommand]
     public void Cancel()
     {
-        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-        mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
+        GoToUserList();
     }
 
     [RelayCommand]
     public async Task SaveChanges()
     {
+        ErrorMessage = "";
         var userService = _serviceProvider.GetRequiredService<IUserService>();
         bool? result = await userService.AddAsync(NewUserForm);
 
@@ -43,11 +43,7 @@ public partial class UserNewViewModel(IServiceProvider serviceProvider) : Observ
         {
             ErrorMessage = "Error: Could not create user.";
         }
-
     }
-
-
-
 
 
     [RelayCommand]

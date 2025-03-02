@@ -80,11 +80,12 @@ public class ProjectService(IProjectRepository projectRepository, IProjectFactor
         existingProject.AssociatedProducts = form.AssociatedProducts;
 
         List<ProductEntity> products = await GetAssociatedEntitiesAsync(existingProject);
+        StatusTypeEntity status = await _statusTypeRepository.GetAsync(x => x.StatusName == form.Status);
 
 
-        var updatedEntity = _projectMapper.ToEntity(existingProject, products);
+        var updatedEntity = _projectMapper.ToEntity(existingProject, products, status.Id);
 
-        return await _projectRepository.UpdateAsync(x => x.Id == existingProject.Id, updatedEntity);
+        return await _projectRepository.UpdateAsyncc(updatedEntity, products);
     }
 
     public async Task<bool?> DeleteAsync(int id)

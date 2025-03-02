@@ -40,7 +40,7 @@
 
                 <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="New Project" FontSize="34" Foreground="White" TextAlignment="Center"/>
 
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="1" Margin="30">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -61,15 +61,17 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Text="Title*" Style="{StaticResource FormLabelText}" />
-                    <TextBox Text="{Binding NewProjectForm.Title}" Grid.Row="1" Margin="0 0 5 0" Style="{StaticResource InputText}"/>
+                    <TextBox Text="{Binding NewProjectForm.Title}" Grid.Row="1" Margin="0 0 5 0"/>
 
                     <TextBlock Text="Description" Grid.Row="2" Style="{StaticResource FormLabelText}" />
-                    <TextBox Text="{Binding NewProjectForm.Description}" Grid.Row="3" Margin="0 0 5 0" Style="{StaticResource InputText}"/>
+                    <TextBox Text="{Binding NewProjectForm.Description}" Grid.Row="3" Margin="0 0 5 0" />
 
                     <!-- Ive created this controls with a lot of help from AI, with some small modifications -->
                     <TextBlock Text="Customer*" Grid.Row="4" Style="{StaticResource FormLabelText}" />
                     <ComboBox ItemsSource="{Binding AvailableCustomers}" 
-                              SelectedItem="{Binding NewProjectForm.AssociatedCustomer}" 
+                              SelectedItem="{Binding NewProjectForm.AssociatedCustomer}"
+                              SelectedValue="{Binding NewProjectForm.AssociatedCustomer.CustomerName, Mode=TwoWay}"
+                              SelectedValuePath="CustomerName"
                               DisplayMemberPath="CustomerName" Grid.Row="5" />
 
                     <TextBlock Text="Assigned User*" Grid.Row="6" Style="{StaticResource FormLabelText}" />

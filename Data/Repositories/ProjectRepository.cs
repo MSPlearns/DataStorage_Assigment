@@ -2,6 +2,8 @@
 using Data.Entities;
 using Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace Data.Repositories;
 
@@ -37,5 +39,39 @@ public class ProjectRepository(DataContext context) : BaseRepository<ProjectEnti
 
         //TODO: When Businnes and Presentation are implemented, implement the rest of EagerLoading in the service layer and the presentation layer
     }
+
+
+    public  async Task<bool?> UpdateAsyncc(ProjectEntity updatedEntity, List<ProductEntity> newProducts)
+    {
+        if (updatedEntity == null)
+            return null!;
+        try
+        {
+            var existingEntity = await _dbSet
+                .Include(p => p.Products)
+                .FirstOrDefaultAsync(p => p.Id == updatedEntity.Id);
+
+            if (existingEntity == null)
+                return null!;
+
+            _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
+
+            existingEntity.Products.Clear();
+            foreach (var product in newProducts)
+            {
+                existingEntity.Products.Add(product);
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error updating {nameof(ProductEntity)} entity:: {ex.Message}");
+            return false;
+        }
+    }
+
+
 }
 
