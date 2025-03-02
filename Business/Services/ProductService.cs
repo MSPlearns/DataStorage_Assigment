@@ -5,6 +5,7 @@ using Data.Repositories;
 using Domain.Dtos;
 using Domain.Factories;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Business.Services;
 
@@ -29,7 +30,12 @@ public class ProductService(IProductRepository productRepository, IProductFactor
     public async Task<IEnumerable<Product>> GetAllAsync()
     {
         List<Product> productList = [];
-        var result = await _productRepository.GetAllAsync();
+        var result = await _productRepository.GetAllAsync(query => query
+        .Include(c => c.Projects)
+        .ThenInclude(p => p.Status)
+        );
+
+
         foreach (var productEntity in result)
         {
             List<ProjectReferenceModel> associatedProjectReferences = TransformEntitiesToReferenceModels(productEntity.Projects);
@@ -40,7 +46,12 @@ public class ProductService(IProductRepository productRepository, IProductFactor
 
     public async Task<Product?> GetByIdAsync(int id)
     {
-        var productEntity = await _productRepository.GetAsync(x => x.Id == id);
+        var productEntity = await _productRepository.GetAsync(
+        x => x.Id == id,
+         query => query
+        .Include(c => c.Projects)
+        .ThenInclude(p => p.Status)
+        );
         if (productEntity == null)
         {
             return null;
@@ -55,7 +66,6 @@ public class ProductService(IProductRepository productRepository, IProductFactor
     {
         existingProduct.ProductName = form.ProductName;
         existingProduct.Price = form.Price;
-        existingProduct.AssociatedProjects = form.AssociatedProjects;
 
 
         List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(existingProduct);

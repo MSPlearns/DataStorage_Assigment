@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Business.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,33 @@ public partial class UserDetailViewModel(IServiceProvider serviceProvider) : Obs
 
     [RelayCommand]
 
+    public async Task DeleteUser()
+    {
+        var userService = _serviceProvider.GetRequiredService<IUserService>();
+        bool? result = await userService.DeleteAsync(CurrentUser.Id);
+        if (result == true)
+        {
+            var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+            mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
+        }
+
+    }
+
+    [RelayCommand]
+    public void GoToUserEdit()
+    {
+        var userEditViewModel = _serviceProvider.GetRequiredService<UserEditViewModel>();
+        //userEditViewModel.CurrentUser = CurrentUser;
+        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+        mainViewModel.CurrentViewModel = userEditViewModel;
+    }
+
+
+
+
+
+
+    [RelayCommand]
     public void GoToProjectList()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();

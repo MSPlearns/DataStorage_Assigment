@@ -7,24 +7,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Presentation.ViewModels;
 
-public partial class CustomerNewViewModel : ObservableObject
+public partial class CustomerNewViewModel(IServiceProvider serviceProvider) : ObservableObject
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     [ObservableProperty]
     private Customer _currentCustomer = new();
 
     [ObservableProperty]
-    private string _errorMessage;
+    private string _errorMessage = "";
 
     [ObservableProperty]
     private CreateCustomerForm _newCustomerForm = new();
-
-    public CustomerNewViewModel(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-        _errorMessage = "";
-    }
 
     [RelayCommand]
     public void Cancel()
@@ -51,8 +45,13 @@ public partial class CustomerNewViewModel : ObservableObject
 
     }
 
-    [RelayCommand]
 
+
+
+
+
+
+    [RelayCommand]
     public void GoToProjectList()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();

@@ -45,14 +45,14 @@ public partial class UserListViewModel : ObservableObject
     [RelayCommand]
     public async Task GoToUserDetail(UserReferenceModel selectedUserReference)
     {
-        var userService = _serviceProvider.GetRequiredService<UserService>();
+        var userService = _serviceProvider.GetRequiredService<IUserService>();
         var selectedUserModel = await userService.GetByIdAsync(selectedUserReference.Id);
 
         var userDetailViewModel = _serviceProvider.GetRequiredService<UserDetailViewModel>();
         userDetailViewModel.CurrentUser = selectedUserModel;
 
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-        mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserDetailViewModel>();
+        mainViewModel.CurrentViewModel = userDetailViewModel;
     }
 
     [RelayCommand]

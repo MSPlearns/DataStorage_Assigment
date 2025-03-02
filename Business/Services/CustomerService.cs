@@ -56,8 +56,8 @@ public class CustomerService(ICustomerRepository customerRepository,
          query => query
         .Include(c => c.Projects)
         .ThenInclude(p => p.Status)
-       
-    );
+        );
+
         if (customerEntity == null)
         {
             return null;

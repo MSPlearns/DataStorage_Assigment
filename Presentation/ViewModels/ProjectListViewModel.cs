@@ -42,10 +42,16 @@ public partial class ProjectListViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void GoToProjectDetail()
+    public async Task GoToProjectDetail(ProjectReferenceModel selectedProjectReference)
     {
+        var projectService = _serviceProvider.GetRequiredService<IProjectService>();
+        var selectedProjectModel = await projectService.GetByIdAsync(selectedProjectReference.Id);
+
+        var projectDetailViewModel = _serviceProvider.GetRequiredService<ProjectDetailViewModel>();
+        projectDetailViewModel.CurrentProject = selectedProjectModel;
+
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-        mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<ProjectDetailViewModel>();
+        mainViewModel.CurrentViewModel = projectDetailViewModel;
     }
 
     [RelayCommand]

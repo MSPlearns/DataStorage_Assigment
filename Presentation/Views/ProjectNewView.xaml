@@ -3,30 +3,120 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
       xmlns:local="clr-namespace:Presentation.Views"
       xmlns:viewmodels="clr-namespace:Presentation.ViewModels"
       d:DataContext="{d:DesignInstance Type=viewmodels:ProjectNewViewModel}"
       mc:Ignorable="d" 
       d:DesignHeight="900" d:DesignWidth="1260">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Border Background="#333335" CornerRadius="0 0 10 10" Padding="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <Grid x:Name="TopBar" Grid.Row="0" Background="Transparent" Margin="15 0 7.5 0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <Grid x:Name="TopBar" Grid.Row="0" Background="Transparent" Margin="15 0 7.5 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <Button Content="Projects" Grid.Column="0" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProjectListCommand}"/>
-            <Button Content="Products" Grid.Column="1" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProductListCommand}"/>
-            <Button Content="Customers" Grid.Column="2" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerListCommand}"/>
-            <Button Content="Users" Grid.Column="3" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToUserListCommand}"/>
+                <Button Content="Projects" Grid.Column="0" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProjectListCommand}"/>
+                <Button Content="Products" Grid.Column="1" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToProductListCommand}"/>
+                <Button Content="Customers" Grid.Column="2" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerListCommand}"/>
+                <Button Content="Users" Grid.Column="3" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToUserListCommand}"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="New Project" FontSize="34" Foreground="White" TextAlignment="Center"/>
+
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Title*" Style="{StaticResource FormLabelText}" />
+                    <TextBox Text="{Binding NewProjectForm.Title}" Grid.Row="1" Margin="0 0 5 0" Style="{StaticResource InputText}"/>
+
+                    <TextBlock Text="Description" Grid.Row="2" Style="{StaticResource FormLabelText}" />
+                    <TextBox Text="{Binding NewProjectForm.Description}" Grid.Row="3" Margin="0 0 5 0" Style="{StaticResource InputText}"/>
+
+                    <!-- Ive created this controls with a lot of help from AI, with some small modifications -->
+                    <TextBlock Text="Customer*" Grid.Row="4" Style="{StaticResource FormLabelText}" />
+                    <ComboBox ItemsSource="{Binding AvailableCustomers}" 
+                              SelectedItem="{Binding NewProjectForm.AssociatedCustomer}" 
+                              DisplayMemberPath="CustomerName" Grid.Row="5" />
+
+                    <TextBlock Text="Assigned User*" Grid.Row="6" Style="{StaticResource FormLabelText}" />
+                    <ComboBox ItemsSource="{Binding AvailableUsers}" 
+                              SelectedItem="{Binding NewProjectForm.AssociatedUser}" 
+                              DisplayMemberPath="FullName" Grid.Row="7" />
+
+                    <TextBlock Text="Products" Grid.Row="8" Style="{StaticResource FormLabelText}" />
+                    <ListBox ItemsSource="{Binding AvailableProducts}" 
+                                Grid.Row="9" 
+                                Height="100">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding isSelected}" 
+                          Command="{Binding DataContext.ProductSelectionChangedCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                          CommandParameter="{Binding}" />
+                                    <TextBlock Text="{Binding ProductName}" VerticalAlignment="Center" Margin="5,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <TextBlock Text="Start Date*" Grid.Row="10" Style="{StaticResource FormLabelText}" />
+                    <DatePicker SelectedDate="{Binding NewProjectForm.StartDate}" Grid.Row="11" />
+
+                    <TextBlock Text="End Date" Grid.Row="12" Style="{StaticResource FormLabelText}" />
+                    <DatePicker SelectedDate="{Binding NewProjectForm.EndDate}" Grid.Row="13" />
+
+                    <TextBlock Text="Status*" Grid.Row="14" Style="{StaticResource FormLabelText}" />
+                    <ComboBox ItemsSource="{Binding AvailableStatuses}" 
+                              SelectedItem="{Binding NewProjectForm.Status}" 
+                               Grid.Row="15" />
+                    <!-- End of almost AI generated code -->
+                </Grid>
+
+                <TextBlock Grid.Row="2" Text="{Binding ErrorMessage}" Style="{StaticResource FormErrorText}"/>
+
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="Save" Style="{StaticResource NavigationButtonStyle}" Command="{Binding SaveChangesCommand}" />
+                    <Button Grid.Column="1" Content="Cancel" Style="{StaticResource NavigationButtonStyle}" Command="{Binding CancelCommand}" />
+                </Grid>
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </UserControl>

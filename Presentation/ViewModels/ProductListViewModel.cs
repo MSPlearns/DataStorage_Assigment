@@ -40,10 +40,16 @@ public partial class ProductListViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void GoToProductDetail()
+    public async Task GoToProductDetail(ProductReferenceModel selectedProductReference)
     {
+        var productService = _serviceProvider.GetRequiredService<IProductService>();
+        var selectedProductModel = await productService.GetByIdAsync(selectedProductReference.Id);
+
+        var productDetailViewModel = _serviceProvider.GetRequiredService<ProductDetailViewModel>();
+        productDetailViewModel.CurrentProduct = selectedProductModel;
+
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-        mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<ProductDetailViewModel>();
+        mainViewModel.CurrentViewModel = productDetailViewModel;
     }
 
     [RelayCommand]

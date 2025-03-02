@@ -5,6 +5,7 @@ using Data.Repositories;
 using Domain.Dtos;
 using Domain.Factories;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Business.Services;
 
@@ -29,7 +30,12 @@ public class UserService(IUserRepository userRepository, IUserFactory userFactor
     public async Task<IEnumerable<User>> GetAllAsync()
     { 
         List<User> userList = [];
-        var result = await _userRepository.GetAllAsync();
+        var result = await _userRepository.GetAllAsync(query => query
+        .Include(c => c.Projects)
+        .ThenInclude(p => p.Status)
+        );
+
+
         foreach (var userEntity in result)
         {
             List<ProjectReferenceModel> associatedProjectsReferences = TransformEntitiesToReferenceModels(userEntity.Projects);
@@ -40,7 +46,12 @@ public class UserService(IUserRepository userRepository, IUserFactory userFactor
 
     public async Task<User?> GetByIdAsync(int id)
     {
-        var result = await _userRepository.GetAsync(x => x.Id == id);
+        var result = await _userRepository.GetAsync(
+        x => x.Id == id,
+         query => query
+        .Include(c => c.Projects)
+        .ThenInclude(p => p.Status)
+        );
         if (result == null)
         {
             return null;
@@ -55,7 +66,6 @@ public class UserService(IUserRepository userRepository, IUserFactory userFactor
         existingUser.FirstName = form.FirstName;
         existingUser.LastName = form.LastName;
         existingUser.Email = form.Email;
-        existingUser.AssociatedProjects = form.AssociatedProjects;
         List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(existingUser);
         var updatedEntity =  _userMapper.ToEntity(existingUser, projects);
 

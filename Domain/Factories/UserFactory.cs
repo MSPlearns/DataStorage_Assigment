@@ -11,7 +11,6 @@ public class UserFactory : IUserFactory
             FirstName = form.FirstName,
             LastName = form.LastName,
             Email = form.Email,
-            AssociatedProjects = form.AssociatedProjects
         };
     }
 
@@ -22,7 +21,6 @@ public class UserFactory : IUserFactory
             FirstName = form.FirstName,
             LastName = form.LastName,
             Email = form.Email,
-            AssociatedProjects = form.AssociatedProjects
         };
     }
 }
