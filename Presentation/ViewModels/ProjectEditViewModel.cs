@@ -7,18 +7,18 @@ using Domain.Dtos;
 using Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
-using System;
-
+using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.ViewModels;
 
 public partial class ProjectEditViewModel : ObservableObject
 {
-
     private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private Project _currentProject = new();
+
+    public Project _originalProject = new();
 
     [ObservableProperty]
     private string _errorMessage = "";
@@ -51,7 +51,7 @@ public partial class ProjectEditViewModel : ObservableObject
         await LoadAvailableCustomers();
         await LoadAvailableProducts();
         await LoadAvailableStatuses();
-        //await UpdateIsSelectedInAvailableProductsAsync(); 
+        await UpdateIsSelectedInAvailableProductsAsync(); 
         //This is not working, it does what it is supposed to do in the background but it is not displaying in the view
     }
 
@@ -98,20 +98,20 @@ public partial class ProjectEditViewModel : ObservableObject
         }
     }
 
-    //public async Task UpdateIsSelectedInAvailableProductsAsync()
-    //{
-    //    foreach (var product in AvailableProducts)
-    //    {
-    //        if(UpProjectForm.AssociatedProducts.Contains(product))
-    //        {
-    //            product.isSelected = true;
-    //        }
-    //        else
-    //        {
-    //            product.isSelected = false;
-    //        }
-    //    }
-    //}
+    public async Task UpdateIsSelectedInAvailableProductsAsync()
+    {
+        foreach (var product in AvailableProducts)
+        {
+            if (UpProjectForm.AssociatedProducts.Contains(product))
+            {
+                product.isSelected = true;
+            }
+            else
+            {
+                product.isSelected = false;
+            }
+        }
+    }
     #endregion LoadDataMethods
 
 
@@ -122,7 +122,7 @@ public partial class ProjectEditViewModel : ObservableObject
         if (ErrorMessage == "")
         {
             var projectDetailViewModel = _serviceProvider.GetRequiredService<ProjectDetailViewModel>();
-            projectDetailViewModel.CurrentProject = CurrentProject;
+            projectDetailViewModel.CurrentProject = _originalProject;
             var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
             mainViewModel.CurrentViewModel = projectDetailViewModel;
         }
@@ -132,42 +132,46 @@ public partial class ProjectEditViewModel : ObservableObject
     [RelayCommand]
     public async Task SaveChanges()
     {
-        ErrorMessage = "";
+        SyncSelectedProducts();
+
+        if (!ValidateForm())
+            return;
+
+        try
+        {
+            var projectService = _serviceProvider.GetRequiredService<IProjectService>();
+            bool? result = await projectService.UpdateAsync(UpProjectForm, CurrentProject);
+
+            if (result == true)
+            {
+                var projectDetailViewModel = _serviceProvider.GetRequiredService<ProjectDetailViewModel>();
+                projectDetailViewModel.CurrentProject = await projectService.GetByIdAsync(CurrentProject.Id);
+                var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+                mainViewModel.CurrentViewModel = projectDetailViewModel;
+            }
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Error: Could not create project.";
+
+        }
+    }
+
+    private void SyncSelectedProducts()
+    {
         foreach (var product in AvailableProducts)
         {
             if (product.isSelected)
             {
                 SelectedProducts.Add(product);
             }
-            else 
+            else
             {
                 SelectedProducts.Remove(product);
             }
         }
         UpProjectForm.AssociatedProducts = SelectedProducts.ToList();
-
-        var projectService = _serviceProvider.GetRequiredService<IProjectService>();
-        bool? result = await projectService.UpdateAsync(UpProjectForm, CurrentProject);
-
-        if (result == true)
-        {
-            var projectDetailViewModel = _serviceProvider.GetRequiredService<ProjectDetailViewModel>();
-            projectDetailViewModel.CurrentProject = CurrentProject;
-            var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-            mainViewModel.CurrentViewModel = projectDetailViewModel;
-        }
-        else
-        {
-            ErrorMessage = "Error: Could not create project.";
-        }
     }
-
-
-
-
-
-
-
 
     [RelayCommand]
     public void ProductSelectionChanged(ProductReferenceModel selectedProduct)
@@ -181,8 +185,45 @@ public partial class ProjectEditViewModel : ObservableObject
             UpProjectForm.AssociatedProducts.Remove(selectedProduct);
         }
     }
-    [RelayCommand]
 
+    #region validation
+    private bool ValidateForm()
+    {
+        ErrorMessage = "";
+        bool isFormValid = true;
+        var validationContext = new ValidationContext(new Project());
+        var validationResults = new List<ValidationResult>();
+        var validationErrors = new List<string>();
+
+        foreach (var property in typeof(UpdateProjectForm).GetProperties())
+        {
+            validationContext.MemberName = property.Name;
+            if (!Validator.TryValidateProperty(property.GetValue(UpProjectForm), validationContext, validationResults))
+            {
+                isFormValid = false;
+            }
+        }
+
+        if (UpProjectForm.AssociatedProducts.Count == 0) //Custom validation to make sure at least one product is selected
+        {
+            isFormValid = false;
+            validationErrors.Add("At least one product must be selected.");
+        }
+
+        if (!isFormValid)
+        {
+            foreach (var error in validationResults)
+            {
+                validationErrors.Add(error.ErrorMessage); //validation method result  Error Message not the class ErrorMessage
+            }
+        }
+        ErrorMessage = string.Join(Environment.NewLine, validationErrors);
+        return isFormValid;
+    }
+    #endregion validation
+
+    #region navigationMethods
+    [RelayCommand]
     public void GoToProjectList()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
@@ -209,5 +250,6 @@ public partial class ProjectEditViewModel : ObservableObject
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
     }
+    #endregion navigationMethods
 }
 

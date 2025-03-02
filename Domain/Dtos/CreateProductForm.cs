@@ -5,6 +5,6 @@ namespace Domain.Dtos;
 public class CreateProductForm
 {
     public string ProductName { get; set; } = null!;
-    public decimal Price { get; set; }
+    public string InputPrice { get; set; }
     public List<ProjectReferenceModel> AssociatedProjects { get; set; } = [];
 }

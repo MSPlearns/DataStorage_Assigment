@@ -4,9 +4,9 @@
     <!-- Navigation buttons -->
     <Style x:Key="NavigationButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="#555555" />
-        <!-- Default background color for unselected button -->
+
         <Setter Property="Foreground" Value="White" />
-        <!-- Text color -->
+
         <Setter Property="FontSize" Value="16" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -14,22 +14,31 @@
         <Setter Property="Margin" Value="5" />
         <Setter Property="Padding" Value="10" />
 
-        <!-- Define the style for hover state -->
+
         <Style.Triggers>
-            <!-- Hover effect -->
+
             <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True">
                 <Setter Property="Background" Value="#777777" />
             </DataTrigger>
+        </Style.Triggers>
+    </Style>
 
-            <!-- Selected state -->
-            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True">
-                <Setter Property="Background" Value="#007BFF" />
-                <!-- Blue background for selected button -->
-                <Setter Property="Foreground" Value="White" />
-                <!-- White text for selected button -->
+    <!-- Navigation button active page -->
+    <Style x:Key="ActivePageButtonStyle" TargetType="Button" BasedOn="{StaticResource NavigationButtonStyle}">
+        <Setter Property="Background" Value="#FFFFFF" />
+        <Setter Property="Foreground" Value="#555555" />
+        <Style.Triggers>
+
+            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True">
+                <Setter Property="Background" Value="#CCCCCC" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
+
+
+
+
+    <!--   Top Bar Buton -->
 <Style x:Key="TopBarButton" TargetType="Button">
     <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
     <Setter Property="FontSize" Value="25"/>

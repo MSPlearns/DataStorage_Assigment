@@ -34,15 +34,27 @@ public partial class CustomerDetailViewModel(IServiceProvider serviceProvider) :
     {
         var customerEditViewModel = _serviceProvider.GetRequiredService<CustomerEditViewModel>();
         customerEditViewModel.CurrentCustomer = CurrentCustomer;
+        customerEditViewModel._originalCustomer = CurrentCustomer;
         customerEditViewModel.UpCustomerForm.CustomerName = CurrentCustomer.CustomerName;
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = customerEditViewModel;
     }
 
-
-
     [RelayCommand]
+    public async Task GoToProjectDetail(ProjectReferenceModel selectedProjectReference)
+    {
+        var projectService = _serviceProvider.GetRequiredService<IProjectService>();
+        var selectedProjectModel = await projectService.GetByIdAsync(selectedProjectReference.Id);
 
+        var projectDetailViewModel = _serviceProvider.GetRequiredService<ProjectDetailViewModel>();
+        projectDetailViewModel.CurrentProject = selectedProjectModel;
+
+        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+        mainViewModel.CurrentViewModel = projectDetailViewModel;
+    }
+
+    #region navigationMethods
+    [RelayCommand]
     public void GoToProjectList()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
@@ -69,5 +81,6 @@ public partial class CustomerDetailViewModel(IServiceProvider serviceProvider) :
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
     }
+    #endregion navigationMethods
 }
 

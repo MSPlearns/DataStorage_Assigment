@@ -7,7 +7,7 @@ public class CreateProjectForm
     public string Title { get; set; } = null!;
     public string? Description { get; set; }
 
-    public DateTime StartDate { get; set; }
+    public DateTime StartDate { get; set; } = DateTime.Now;
 
     public DateTime? EndDate { get; set; }
 

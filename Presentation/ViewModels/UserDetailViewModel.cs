@@ -33,18 +33,31 @@ public partial class UserDetailViewModel(IServiceProvider serviceProvider) : Obs
     {
         var userEditViewModel = _serviceProvider.GetRequiredService<UserEditViewModel>();
         userEditViewModel.CurrentUser = CurrentUser;
+        userEditViewModel._originalUser = CurrentUser;
         userEditViewModel.UpUserForm.FirstName = CurrentUser.FirstName;
         userEditViewModel.UpUserForm.LastName = CurrentUser.LastName;
         userEditViewModel.UpUserForm.Email = CurrentUser.Email;
+
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = userEditViewModel;
     }
 
 
+    [RelayCommand]
+    public async Task GoToProjectDetail(ProjectReferenceModel selectedProjectReference)
+    {
+        var projectService = _serviceProvider.GetRequiredService<IProjectService>();
+        var selectedProjectModel = await projectService.GetByIdAsync(selectedProjectReference.Id);
+
+        var projectDetailViewModel = _serviceProvider.GetRequiredService<ProjectDetailViewModel>();
+        projectDetailViewModel.CurrentProject = selectedProjectModel;
+
+        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+        mainViewModel.CurrentViewModel = projectDetailViewModel;
+    }
 
 
-
-
+    #region navigationMethods
     [RelayCommand]
     public void GoToProjectList()
     {
@@ -72,4 +85,5 @@ public partial class UserDetailViewModel(IServiceProvider serviceProvider) : Obs
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
     }
+    #endregion navigationMethods
 }

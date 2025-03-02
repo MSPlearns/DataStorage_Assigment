@@ -22,7 +22,6 @@ public partial class ProjectDetailViewModel : ObservableObject
 
 
     [RelayCommand]
-
     public async Task DeleteProject()
     {
         var projectService = _serviceProvider.GetRequiredService<IProjectService>();
@@ -32,7 +31,6 @@ public partial class ProjectDetailViewModel : ObservableObject
             var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
             mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<ProjectListViewModel>();
         }
-
     }
 
     [RelayCommand]
@@ -40,12 +38,13 @@ public partial class ProjectDetailViewModel : ObservableObject
     {
         var projectEditViewModel = _serviceProvider.GetRequiredService<ProjectEditViewModel>();
         projectEditViewModel.CurrentProject = CurrentProject;
+        projectEditViewModel._originalProject = CurrentProject;
 
         projectEditViewModel.UpProjectForm = new UpdateProjectForm
         {
             Title = CurrentProject.Title,
             Description = CurrentProject.Description,
-            //AssociatedProducts = CurrentProject.AssociatedProducts,
+            AssociatedProducts = CurrentProject.AssociatedProducts,
             StartDate = CurrentProject.StartDate,
             EndDate = CurrentProject.EndDate,
             AssociatedUser = CurrentProject.AssociatedUser,
@@ -55,13 +54,25 @@ public partial class ProjectDetailViewModel : ObservableObject
 
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
 
-        //await projectEditViewModel.UpdateIsSelectedInAvailableProductsAsync();
+        await projectEditViewModel.UpdateIsSelectedInAvailableProductsAsync();
         mainViewModel.CurrentViewModel = projectEditViewModel;
     }
 
+    #region navigationMethods
+    [RelayCommand]
+    public async Task GoToProductDetail(ProductReferenceModel selectedProductReference)
+    {
+        var productService = _serviceProvider.GetRequiredService<IProductService>();
+        var selectedProductModel = await productService.GetByIdAsync(selectedProductReference.Id);
+
+        var productDetailViewModel = _serviceProvider.GetRequiredService<ProductDetailViewModel>();
+        productDetailViewModel.CurrentProduct = selectedProductModel;
+
+        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+        mainViewModel.CurrentViewModel = productDetailViewModel;
+    }
 
     [RelayCommand]
-
     public void GoToProjectList()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
@@ -88,4 +99,5 @@ public partial class ProjectDetailViewModel : ObservableObject
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
     }
+    #endregion navigationMethods
 }

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Domain.Dtos;
 using Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.ViewModels;
 
@@ -30,27 +31,59 @@ public partial class CustomerNewViewModel(IServiceProvider serviceProvider) : Ob
     [RelayCommand]
     public async Task SaveChanges()
     {
-        var customerService = _serviceProvider.GetRequiredService<ICustomerService>();
-        bool? result = await customerService.AddAsync(NewCustomerForm);
-
-        if (result == true)
+        if (!ValidateForm())
         {
-            var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-            mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<CustomerListViewModel>();
+            return;
         }
-        else
+
+        try
         {
+            var customerService = _serviceProvider.GetRequiredService<ICustomerService>();
+            bool? result = await customerService.AddAsync(NewCustomerForm);
+
+            if (result == true)
+            {
+                GoToCustomerList();
+            }
+        }
+        catch (Exception)
+        {
+
             ErrorMessage = "Error: Could not create customer.";
         }
-
     }
 
+    #region validation
+    private bool ValidateForm()
+    {
+        ErrorMessage = "";
+        bool isFormValid = true;
+        var validationContext = new ValidationContext(new Customer());
+        var validationResults = new List<ValidationResult>();
+        var validationErrors = new List<string>();
 
+        foreach (var property in typeof(CreateCustomerForm).GetProperties())
+        {
+            validationContext.MemberName = property.Name;
+            if (!Validator.TryValidateProperty(property.GetValue(NewCustomerForm), validationContext, validationResults))
+            {
+                isFormValid = false;
+            }
+        }
 
+        if (!isFormValid)
+        {
+            foreach (var error in validationResults)
+            {
+                validationErrors.Add(error.ErrorMessage); //validation method result  Error Message not the class ErrorMessage
+            }
+        }
+        ErrorMessage = string.Join(Environment.NewLine, validationErrors);
+        return isFormValid;
+    }
+    #endregion validation
 
-
-
-
+    #region navigationMethods
     [RelayCommand]
     public void GoToProjectList()
     {
@@ -78,4 +111,5 @@ public partial class CustomerNewViewModel(IServiceProvider serviceProvider) : Ob
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
     }
+    #endregion navigationMethods
 }

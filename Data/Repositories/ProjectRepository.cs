@@ -41,7 +41,7 @@ public class ProjectRepository(DataContext context) : BaseRepository<ProjectEnti
     }
 
 
-    public  async Task<bool?> UpdateAsyncc(ProjectEntity updatedEntity, List<ProductEntity> newProducts)
+    public  async Task<bool?> UpdateAsync(ProjectEntity updatedEntity, List<ProductEntity> newProducts)
     {
         if (updatedEntity == null)
             return null!;
@@ -55,11 +55,12 @@ public class ProjectRepository(DataContext context) : BaseRepository<ProjectEnti
                 return null!;
 
             _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
-
-            existingEntity.Products.Clear();
-            foreach (var product in newProducts)
-            {
-                existingEntity.Products.Add(product);
+            if(newProducts.Count != 0)
+        {        existingEntity.Products.Clear();
+                foreach (var product in newProducts)
+                {
+                    existingEntity.Products.Add(product);
+                }
             }
 
             await _context.SaveChangesAsync();

@@ -79,7 +79,7 @@ namespace Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("Date");
 
                     b.Property<DateTime>("StartDate")
@@ -100,6 +100,9 @@ namespace Data.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("StatusId");
+
+                    b.HasIndex("Title")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 

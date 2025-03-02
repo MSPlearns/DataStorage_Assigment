@@ -28,7 +28,7 @@
                 <Button Content="Customers" Grid.Column="2" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerListCommand}"/>
                 <Button Content="Users" Grid.Column="3" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToUserListCommand}"/>
             </Grid>
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="1" Margin="30">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>

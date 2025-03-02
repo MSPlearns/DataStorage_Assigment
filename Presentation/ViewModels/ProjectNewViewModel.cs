@@ -8,6 +8,7 @@ using Domain.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace Presentation.ViewModels;
@@ -42,6 +43,7 @@ public partial class ProjectNewViewModel : ObservableObject
         LoadData();
     }
 
+    #region dataLoading
     public async Task LoadData()
     {
         await LoadAvailableUsers();
@@ -94,15 +96,40 @@ public partial class ProjectNewViewModel : ObservableObject
         }
     }
 
+    #endregion dataLoading
+
     [RelayCommand]
     public void Cancel()
     {
-        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-        mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<ProjectListViewModel>();
+        GoToProjectList();
     }
 
     [RelayCommand]
     public async Task SaveChanges()
+    {
+        SyncSelectedProducts();
+
+        if (!ValidateForm())
+            return;
+
+        try
+        {
+            var projectService = _serviceProvider.GetRequiredService<IProjectService>();
+            bool? result = await projectService.AddAsync(NewProjectForm);
+
+            if (result == true)
+            {
+                GoToProjectList();
+            }
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Error: Could not create project.";
+
+        }
+    }
+
+    private void SyncSelectedProducts()
     {
         foreach (var product in AvailableProducts)
         {
@@ -112,23 +139,10 @@ public partial class ProjectNewViewModel : ObservableObject
             }
         }
         NewProjectForm.AssociatedProducts = SelectedProducts.ToList();
-
-        var projectService = _serviceProvider.GetRequiredService<IProjectService>();
-        bool? result = await projectService.AddAsync(NewProjectForm);
-
-        if (result == true)
-        {
-            var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-            mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<ProjectListViewModel>();
-        }
-        else
-        {
-            ErrorMessage = "Error: Could not create project.";
-        }
     }
 
     [RelayCommand]
-public void ProductSelectionChanged(ProductReferenceModel selectedProduct)
+    public void ProductSelectionChanged(ProductReferenceModel selectedProduct) //This method is called in the view when a product is selected or deselected
     {
         if (selectedProduct.isSelected)
         {
@@ -140,8 +154,45 @@ public void ProductSelectionChanged(ProductReferenceModel selectedProduct)
         }
     }
 
-    [RelayCommand]
+    #region validation
+    private bool ValidateForm()
+    {
+        ErrorMessage = "";
+        bool isFormValid = true;
+        var validationContext = new ValidationContext(new Project());
+        var validationResults = new List<ValidationResult>();
+        var validationErrors = new List<string>();
 
+        foreach (var property in typeof(CreateProjectForm).GetProperties())
+        {
+            validationContext.MemberName = property.Name;
+            if (!Validator.TryValidateProperty(property.GetValue(NewProjectForm), validationContext, validationResults))
+            {
+                isFormValid = false;
+            }
+        }
+
+        if(NewProjectForm.AssociatedProducts.Count == 0) //Custom validation to make sure at least one product is selected
+        {
+            isFormValid = false;
+            validationErrors.Add("At least one product must be selected.");
+        }
+
+        if (!isFormValid)
+        {
+            foreach (var error in validationResults)
+            {
+                validationErrors.Add(error.ErrorMessage); //validation method result  Error Message not the class ErrorMessage
+            }
+        }
+        ErrorMessage = string.Join(Environment.NewLine, validationErrors);
+        return isFormValid;
+    }
+    #endregion validation
+
+
+    #region navigationMethods
+    [RelayCommand]
     public void GoToProjectList()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
@@ -168,4 +219,5 @@ public void ProductSelectionChanged(ProductReferenceModel selectedProduct)
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
     }
+    #endregion navigationMethods
 }

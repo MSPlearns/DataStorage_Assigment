@@ -9,7 +9,7 @@ public class ProductFactory : IProductFactory
         return new Product
         {
             ProductName = form.ProductName,
-            Price = form.Price
+            Price = Decimal.Parse(form.InputPrice)
         };
     }
 
@@ -18,7 +18,7 @@ public class ProductFactory : IProductFactory
         return new Product
         {
             ProductName = form.ProductName,
-            Price = form.Price
+            Price = Decimal.Parse(form.InputPrice)
         };
     }
 }

@@ -64,8 +64,9 @@ public partial class UserListViewModel : ObservableObject
 
 
 
-    [RelayCommand]
 
+    #region navigationMethods
+    [RelayCommand]
     public void GoToProjectList()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
@@ -92,4 +93,5 @@ public partial class UserListViewModel : ObservableObject
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
     }
+    #endregion navigationMethods
 }

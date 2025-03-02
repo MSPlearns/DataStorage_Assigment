@@ -65,7 +65,7 @@ public class ProductService(IProductRepository productRepository, IProductFactor
     public async Task<bool?> UpdateAsync(UpdateProductForm form, Product existingProduct)
     {
         existingProduct.ProductName = form.ProductName;
-        existingProduct.Price = form.Price;
+        existingProduct.Price = Decimal.Parse(form.InputPrice);
 
 
         List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(existingProduct);

@@ -39,6 +39,7 @@ public partial class ProductListViewModel : ObservableObject
         }
     }
 
+    #region navigationMethods    
     [RelayCommand]
     public async Task GoToProductDetail(ProductReferenceModel selectedProductReference)
     {
@@ -59,10 +60,7 @@ public partial class ProductListViewModel : ObservableObject
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<ProductNewViewModel>();
     }
 
-
-
     [RelayCommand]
-
     public void GoToProjectList()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
@@ -89,4 +87,5 @@ public partial class ProductListViewModel : ObservableObject
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
     }
+    #endregion navigationMethods
 }

@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:local="clr-namespace:Presentation.Views"
       xmlns:viewmodels="clr-namespace:Presentation.ViewModels"
       d:DataContext="{d:DesignInstance Type=viewmodels:UserDetailViewModel}"
@@ -29,7 +30,7 @@
                 <Button Content="Customers" Grid.Column="2" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToCustomerListCommand}"/>
                 <Button Content="Users" Grid.Column="3" Style="{StaticResource NavigationButtonStyle}" Command="{Binding GoToUserListCommand}"/>
             </Grid>
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="1" Margin="30">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -43,11 +44,11 @@
 
                 <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="User Details" FontSize="34" Foreground="White" TextAlignment="Center"/>
                 <StackPanel Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
-                    <TextBlock  Text="Name" FontSize="26" Foreground="White" Margin="10"/>
+                    <TextBlock  Text="Name" Style="{StaticResource FormLabelText}"/>
                     <TextBlock  Text="{Binding CurrentUser.FirstName}" FontSize="26" Foreground="White" Margin="10"/>
-                    <TextBlock  Text="Surname" FontSize="26" Foreground="White" Margin="10"/>
+                    <TextBlock  Text="Surname" Style="{StaticResource FormLabelText}"/>
                     <TextBlock  Text="{Binding CurrentUser.LastName}" FontSize="26" Foreground="White" Margin="10"/>
-                    <TextBlock  Text="Email" FontSize="26" Foreground="White" Margin="10"/>
+                    <TextBlock  Text="Email" Style="{StaticResource FormLabelText}"/>
                     <TextBlock  Text="{Binding CurrentUser.Email}" FontSize="26" Foreground="White" Margin="10"/>
                 </StackPanel>
 
@@ -67,6 +68,12 @@
                                 <TextBlock Grid.Column="0"   Text="{Binding Title}" Style="{StaticResource ListCustomerNameText}"/>
                                 <TextBlock Grid.Column="1"   Text="{Binding Status}" Style="{StaticResource ListCustomerNameText}"/>
 
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                                        <i:InvokeCommandAction Command="{Binding DataContext.GoToProjectDetailCommand, 
+                                        RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding .}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>

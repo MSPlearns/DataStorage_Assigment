@@ -53,7 +53,7 @@
                     <TextBox  Text="{Binding NewProductForm.ProductName}"  Grid.Row="1" Margin="0 0 5 0" Style="{StaticResource InputText}">
                     </TextBox>
                     <TextBlock Grid.Row="2"  Text="Price*" Style="{StaticResource FormLabelText}" />
-                    <TextBox  Text="{Binding NewProductForm.Price}" Grid.Column="0" Grid.Row="3" Margin="0 0 5 0" Style="{StaticResource InputText}">
+                    <TextBox  Text="{Binding NewProductForm.InputPrice}" Grid.Column="0" Grid.Row="3" Margin="0 0 5 0" Style="{StaticResource InputText}">
                     </TextBox>
                 </Grid>
 

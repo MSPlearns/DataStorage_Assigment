@@ -28,7 +28,6 @@ public partial class ProjectListViewModel : ObservableObject
         _projectService = projectService;
         _projectMapper = projectMapper;
         LoadProjects();
-
     }
 
     public async Task LoadProjects()
@@ -41,6 +40,7 @@ public partial class ProjectListViewModel : ObservableObject
         }
     }
 
+    #region navigationMethods
     [RelayCommand]
     public async Task GoToProjectDetail(ProjectReferenceModel selectedProjectReference)
     {
@@ -61,10 +61,7 @@ public partial class ProjectListViewModel : ObservableObject
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<ProjectNewViewModel>();
     }
 
-
-
     [RelayCommand]
-
     public void GoToProjectList()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
@@ -91,4 +88,5 @@ public partial class ProjectListViewModel : ObservableObject
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
     }
+    #endregion navigationMethods
 }

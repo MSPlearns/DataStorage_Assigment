@@ -40,6 +40,7 @@ public partial class CustomerListViewModel : ObservableObject
         }
     }
 
+    #region navigationMethods
     [RelayCommand]
     public async Task GoToCustomerDetail(CustomerReferenceModel selectedCustomerReference)
     {
@@ -59,11 +60,7 @@ public partial class CustomerListViewModel : ObservableObject
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<CustomerNewViewModel>();
     }
-
-
-
     [RelayCommand]
-
     public void GoToProjectList()
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
@@ -90,6 +87,5 @@ public partial class CustomerListViewModel : ObservableObject
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<UserListViewModel>();
     }
-
-
+    #endregion navigationMethods
 }

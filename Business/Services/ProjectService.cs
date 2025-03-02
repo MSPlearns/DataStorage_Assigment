@@ -47,7 +47,13 @@ public class ProjectService(IProjectRepository projectRepository, IProjectFactor
 
     public async Task<Project?> GetByIdAsync(int id)
     {
-        ProjectEntity? projectEntity = await _projectRepository.GetAsync(x => x.Id == id);
+        ProjectEntity? projectEntity = await _projectRepository.GetAsync(x => x.Id == id,
+    query => query
+        .Include(p => p.User)
+        .Include(p => p.Customer)
+        .Include(p => p.Status)
+        .Include(p => p.Products)
+);
         if (projectEntity == null)
         {
             return null;
@@ -85,7 +91,7 @@ public class ProjectService(IProjectRepository projectRepository, IProjectFactor
 
         var updatedEntity = _projectMapper.ToEntity(existingProject, products, status.Id);
 
-        return await _projectRepository.UpdateAsyncc(updatedEntity, products);
+        return await _projectRepository.UpdateAsync(updatedEntity, products);
     }
 
     public async Task<bool?> DeleteAsync(int id)

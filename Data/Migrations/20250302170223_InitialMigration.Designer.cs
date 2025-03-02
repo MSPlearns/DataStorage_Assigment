@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250218191053_Init")]
-    partial class Init
+    [Migration("20250302170223_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,11 +82,8 @@ namespace Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("Date");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("Date");
@@ -105,9 +102,10 @@ namespace Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("ProductId");
-
                     b.HasIndex("StatusId");
+
+                    b.HasIndex("Title")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -162,17 +160,26 @@ namespace Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("ProjectProduct", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductId", "ProjectId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectProduct");
+                });
+
             modelBuilder.Entity("Data.Entities.ProjectEntity", b =>
                 {
                     b.HasOne("Data.Entities.CustomerEntity", "Customer")
                         .WithMany("Projects")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.ProductEntity", "Product")
-                        .WithMany("Projects")
-                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -190,19 +197,27 @@ namespace Data.Migrations
 
                     b.Navigation("Customer");
 
-                    b.Navigation("Product");
-
                     b.Navigation("Status");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Data.Entities.CustomerEntity", b =>
+            modelBuilder.Entity("ProjectProduct", b =>
                 {
-                    b.Navigation("Projects");
+                    b.HasOne("Data.Entities.ProductEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Data.Entities.ProjectEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("Data.Entities.ProductEntity", b =>
+            modelBuilder.Entity("Data.Entities.CustomerEntity", b =>
                 {
                     b.Navigation("Projects");
                 });

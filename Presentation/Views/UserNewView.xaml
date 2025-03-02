@@ -62,7 +62,7 @@
                     </TextBox>
                 </Grid>
 
-                <TextBlock Grid.Row="2" Text="{Binding ErrorMessage}" Style="{StaticResource FormErrorText}"/>
+                <TextBlock Grid.Row="2" Text="{Binding FormErrorMessage}" Style="{StaticResource FormErrorText}"/>
 
                 <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
