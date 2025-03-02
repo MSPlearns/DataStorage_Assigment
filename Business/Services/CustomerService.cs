@@ -109,4 +109,8 @@ public class CustomerService(ICustomerRepository customerRepository,
         return projects;
     }
 
+    public async Task<bool> AlreadyExists(Expression<Func<CustomerEntity, bool>> predicate)
+    {
+       return await _customerRepository.EntityExistsAsync(predicate);
+    }
 }

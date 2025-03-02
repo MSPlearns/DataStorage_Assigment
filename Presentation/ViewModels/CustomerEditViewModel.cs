@@ -35,11 +35,9 @@ public partial class CustomerEditViewModel(IServiceProvider serviceProvider) : O
     [RelayCommand]
     public async Task SaveChanges()
     {
-
-        if (!ValidateForm())
-        {
+        var validationResult = await ValidateForm();
+        if (!validationResult)
             return;
-        }
 
         try
         {
@@ -63,7 +61,7 @@ public partial class CustomerEditViewModel(IServiceProvider serviceProvider) : O
     }
 
     #region validation
-    private bool ValidateForm()
+    private async Task<bool> ValidateForm()
     {
         ErrorMessage = "";
         bool isFormValid = true;
@@ -78,6 +76,13 @@ public partial class CustomerEditViewModel(IServiceProvider serviceProvider) : O
             {
                 isFormValid = false;
             }
+        }
+
+        if (UpCustomerForm.CustomerName != _originalCustomer.CustomerName &&
+            await _serviceProvider.GetRequiredService<ICustomerService>().AlreadyExists(c => c.CustomerName == UpCustomerForm.CustomerName))
+        {
+            isFormValid = false;
+            validationErrors.Add("A customer with the same name already exists.");
         }
 
         if (!isFormValid)

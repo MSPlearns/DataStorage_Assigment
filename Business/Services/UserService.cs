@@ -6,6 +6,7 @@ using Domain.Dtos;
 using Domain.Factories;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Business.Services;
 
@@ -101,5 +102,10 @@ public class UserService(IUserRepository userRepository, IUserFactory userFactor
         }
 
         return projects;
+    }
+
+    public async Task<bool> AlreadyExists(Expression<Func<UserEntity, bool>> predicate)
+    {
+        return await _userRepository.EntityExistsAsync(predicate);
     }
 }

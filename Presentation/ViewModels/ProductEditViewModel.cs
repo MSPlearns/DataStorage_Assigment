@@ -38,7 +38,8 @@ public partial class ProductEditViewModel(IServiceProvider serviceProvider) : Ob
     [RelayCommand]
     public async Task SaveChanges()
     {
-        if (!ValidateForm())
+        var validationResult = await ValidateForm();
+        if (!validationResult)
             return;
 
         try
@@ -61,7 +62,7 @@ public partial class ProductEditViewModel(IServiceProvider serviceProvider) : Ob
     }
 
     #region validation
-    private bool ValidateForm()
+    private async Task<bool> ValidateForm()
     {
         ErrorMessage = "";
         bool isFormValid = true;
@@ -77,7 +78,12 @@ public partial class ProductEditViewModel(IServiceProvider serviceProvider) : Ob
                 isFormValid = false;
             }
         }
-
+        if (UpProductForm.ProductName != _originalProduct.ProductName &&
+            await _serviceProvider.GetRequiredService<IProductService>().AlreadyExists(p => p.ProductName == UpProductForm.ProductName))
+        {
+            isFormValid = false;
+            validationErrors.Add("A product with the same name already exists.");
+        }
         if (!isFormValid)
         {
             foreach (var error in validationResults)

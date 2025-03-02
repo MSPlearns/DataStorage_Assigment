@@ -1,10 +1,12 @@
 ﻿using Business.Mappers;
 using Data.Entities;
 using Data.Interfaces;
+using Data.Repositories;
 using Domain.Dtos;
 using Domain.Factories;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 namespace Business.Services;
 
 public class ProjectService(IProjectRepository projectRepository, IProjectFactory projectFactory, IProjectMapper projectMapper, IProductRepository productRepository, IProductMapper productMapper, IStatusTypeRepository statusTypeRepository) : IProjectService
@@ -123,5 +125,10 @@ public class ProjectService(IProjectRepository projectRepository, IProjectFactor
         }
 
         return products;
+    }
+
+    public async Task<bool> AlreadyExists(Expression<Func<ProjectEntity, bool>> predicate)
+    {
+        return await _projectRepository.EntityExistsAsync(predicate);
     }
 }

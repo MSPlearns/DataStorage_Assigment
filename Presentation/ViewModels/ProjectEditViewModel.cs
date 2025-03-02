@@ -134,7 +134,8 @@ public partial class ProjectEditViewModel : ObservableObject
     {
         SyncSelectedProducts();
 
-        if (!ValidateForm())
+        var validationResult = await ValidateForm();
+        if (!validationResult)
             return;
 
         try
@@ -187,7 +188,7 @@ public partial class ProjectEditViewModel : ObservableObject
     }
 
     #region validation
-    private bool ValidateForm()
+    private async Task<bool> ValidateForm()
     {
         ErrorMessage = "";
         bool isFormValid = true;
@@ -208,6 +209,14 @@ public partial class ProjectEditViewModel : ObservableObject
         {
             isFormValid = false;
             validationErrors.Add("At least one product must be selected.");
+        }
+
+        if (UpProjectForm.Title != _originalProject.Title &&
+            await _serviceProvider.GetRequiredService<IProjectService>().AlreadyExists(p => p.Title == UpProjectForm.Title))
+
+        {
+            isFormValid = false;
+            validationErrors.Add("A project with the same title already exists.");
         }
 
         if (!isFormValid)

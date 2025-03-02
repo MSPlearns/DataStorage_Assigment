@@ -28,10 +28,9 @@ public partial class UserNewViewModel(IServiceProvider serviceProvider) : Observ
     [RelayCommand]
     public async Task SaveChanges()
     {
-        if (!ValidateForm())
-        {
+        var validationResult = await ValidateForm();
+        if (!validationResult)
             return;
-        }
 
         try
         {
@@ -51,7 +50,7 @@ public partial class UserNewViewModel(IServiceProvider serviceProvider) : Observ
     }
 
     #region validation
-    private bool ValidateForm()
+    private async Task<bool> ValidateForm()
     {
         FormErrorMessage = "";
         bool isFormValid = true;
@@ -66,6 +65,12 @@ public partial class UserNewViewModel(IServiceProvider serviceProvider) : Observ
             {
                 isFormValid = false;
             }
+        }
+
+        if (await _serviceProvider.GetRequiredService<IUserService>().AlreadyExists(u => u.Email == NewUserForm.Email))
+        {
+            isFormValid = false;
+            validationErrors.Add("A user with the same email already exists.");
         }
 
         if (!isFormValid)

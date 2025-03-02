@@ -31,7 +31,8 @@ public partial class ProductNewViewModel(IServiceProvider serviceProvider) : Obs
     [RelayCommand]
     public async Task SaveChanges()
     {
-        if (!ValidateForm())
+        var validationResult = await ValidateForm();
+        if (!validationResult)
             return;
 
         try
@@ -51,7 +52,7 @@ public partial class ProductNewViewModel(IServiceProvider serviceProvider) : Obs
     }
 
     #region validation
-    private bool ValidateForm()
+    private async Task<bool> ValidateForm()
     {
         ErrorMessage = "";
         bool isFormValid = true;
@@ -67,7 +68,11 @@ public partial class ProductNewViewModel(IServiceProvider serviceProvider) : Obs
                 isFormValid = false;
             }
         }
-
+        if (await _serviceProvider.GetRequiredService<IProductService>().AlreadyExists(c => c.ProductName == NewProductForm.ProductName))
+        {
+            isFormValid = false;
+            validationErrors.Add("A product with the same name already exists.");
+        }
         if (!isFormValid)
         {
             foreach (var error in validationResults)

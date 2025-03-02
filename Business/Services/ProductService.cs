@@ -6,6 +6,7 @@ using Domain.Dtos;
 using Domain.Factories;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Business.Services;
 
@@ -103,6 +104,11 @@ public class ProductService(IProductRepository productRepository, IProductFactor
         }
 
         return projects;
+    }
+
+    public async Task<bool> AlreadyExists(Expression<Func<ProductEntity, bool>> predicate)
+    {
+        return await _productRepository.EntityExistsAsync(predicate);
     }
 }
 

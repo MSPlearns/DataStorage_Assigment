@@ -38,7 +38,8 @@ public partial class UserEditViewModel(IServiceProvider serviceProvider) : Obser
     [RelayCommand]
     public async Task SaveChanges()
     {
-        if (!ValidateForm())
+        var validationResult = await ValidateForm();
+        if (!validationResult)
             return;
 
         try
@@ -62,7 +63,7 @@ public partial class UserEditViewModel(IServiceProvider serviceProvider) : Obser
     }
 
     #region validation
-    private bool ValidateForm()
+    private async Task<bool> ValidateForm()
     {
         FormErrorMessage = "";
         bool isFormValid = true;
@@ -70,12 +71,19 @@ public partial class UserEditViewModel(IServiceProvider serviceProvider) : Obser
         var validationResults = new List<ValidationResult>();
         var validationErrors = new List<string>();
 
-        foreach (var property in typeof(CreateUserForm).GetProperties())
+        foreach (var property in typeof(UpdateUserForm).GetProperties())
         {
             validationContext.MemberName = property.Name;
             if (!Validator.TryValidateProperty(property.GetValue(UpUserForm), validationContext, validationResults))
                 isFormValid = false;
 
+        }
+
+        if (UpUserForm.Email != _originalUser.Email &&
+            await _serviceProvider.GetRequiredService<IUserService>().AlreadyExists(u => u.Email == UpUserForm.Email))
+        {
+            isFormValid = false;
+            validationErrors.Add("A user with the same email already exists.");
         }
 
         if (!isFormValid)

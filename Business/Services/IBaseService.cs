@@ -1,4 +1,6 @@
-﻿namespace Business.Services;
+﻿using System.Linq.Expressions;
+
+namespace Business.Services;
 
 public interface IBaseService<Tentity, TModel, TCreateForm, TUpdateForm> 
     where Tentity : class 
@@ -11,5 +13,6 @@ public interface IBaseService<Tentity, TModel, TCreateForm, TUpdateForm>
     Task<IEnumerable<TModel>> GetAllAsync();
     Task<TModel?> GetByIdAsync(int id);
     Task<bool?> DeleteAsync(int id);
+    Task<bool> AlreadyExists(Expression<Func<Tentity, bool>> predicate);
 
 }

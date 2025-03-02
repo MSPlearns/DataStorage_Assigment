@@ -21,7 +21,10 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         try
         {
             await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
+
+            if(await _context.SaveChangesAsync() == 0)
+                return false;
+
             return true;
         }
         catch (Exception ex)
@@ -42,8 +45,15 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         IQueryable<TEntity> query = _dbSet;
         if (includeExpression != null)
             query = includeExpression(query);
-
-        return await query.ToListAsync();
+        try
+        {
+            return await query.ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error geting all {nameof(TEntity)} entities:: {ex.Message}");
+            return [];
+        }
     }
 
     //This method searches for an entity that matches the expression and returns it.
@@ -52,11 +62,18 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
     //for example if I search for a specific proyect by project id and add customer to the include expression, it will return the project with the customer entity
     public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> expression, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeExpression = null)
     {
-        IQueryable<TEntity> query = _dbSet;
+       IQueryable<TEntity> query = _dbSet;
         if (includeExpression != null)
-            query = includeExpression(query);
-
+            query = includeExpression(query); 
+        try
+        {
         return await query.FirstOrDefaultAsync(expression);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error geting {nameof(TEntity)} entity:: {ex.Message}");
+            return null;
+        }
     }
 
     //Update
@@ -67,15 +84,15 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
             return null!;
         try
         {
-            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression) ?? null!; 
+            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression); 
             if (existingEntity == null)
                 return null!;
 
             _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
 
+            if (await _context.SaveChangesAsync() == 0)
+                return false;
 
-
-            await _context.SaveChangesAsync();
             return true;
         }
         catch (Exception ex)
@@ -93,12 +110,14 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
 
         try
         {
-            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression) ?? null!;
+            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression);
             if (existingEntity == null)
                 return null;
 
             _dbSet.Remove(existingEntity);
-            await _context.SaveChangesAsync();
+            if (await _context.SaveChangesAsync() == 0)
+                return false;
+
             return true;
         }
         catch (Exception ex)
@@ -108,10 +127,8 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         }
     }
 
-    public virtual async Task<bool> AlreadyExistsAsync(Expression<Func<TEntity, bool>> expression)
+    public virtual async Task<bool> EntityExistsAsync(Expression<Func<TEntity, bool>> expression)
     {
         return await _dbSet.AnyAsync(expression);
     }
-
-
 }
