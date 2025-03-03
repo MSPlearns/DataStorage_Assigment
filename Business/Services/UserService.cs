@@ -10,32 +10,41 @@ using System.Linq.Expressions;
 
 namespace Business.Services;
 
-public class UserService(IUserRepository userRepository, IUserFactory userFactory, IUserMapper userMapper, IProjectRepository projectRepository, IProjectMapper projectMapper) : IUserService
+public class UserService(IUserRepository userRepository,
+                         IUserFactory userFactory,
+                         IUserMapper userMapper, 
+                         IProjectMapper projectMapper) : IUserService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserFactory _userFactory = userFactory;
     private readonly IUserMapper _userMapper = userMapper;
-    private readonly IProjectRepository _projectRepository = projectRepository;
     private readonly IProjectMapper _projectMapper = projectMapper;
-    public async Task<bool?> AddAsync(CreateUserForm form)
+    public async Task AddAsync(CreateUserForm form)
     {
-        User userModel = _userFactory.FromForm(form);
-
-        List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(userModel);
-
-        UserEntity userEntity = _userMapper.ToEntity(userModel, projects);
-        return await _userRepository.AddAsync(userEntity);
+        await _userRepository.BeginTransactionAsync();
+        try
+        {
+            User userModel = _userFactory.FromForm(form);
+            UserEntity userEntity = _userMapper.ToEntity(userModel);
+            await _userRepository.AddAsync(userEntity);
+            await _userRepository.SaveAsync();
+            await _userRepository.CommitTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await _userRepository.RollbackTransactionAsync();
+            throw;
+        }
     }
 
 
     public async Task<IEnumerable<User>> GetAllAsync()
-    { 
+    {
         List<User> userList = [];
         var result = await _userRepository.GetAllAsync(query => query
         .Include(c => c.Projects)
         .ThenInclude(p => p.Status)
         );
-
 
         foreach (var userEntity in result)
         {
@@ -47,50 +56,57 @@ public class UserService(IUserRepository userRepository, IUserFactory userFactor
 
     public async Task<User?> GetByIdAsync(int id)
     {
-        var result = await _userRepository.GetAsync(
+        UserEntity? userEntity = await _userRepository.GetAsync(
         x => x.Id == id,
          query => query
         .Include(c => c.Projects)
         .ThenInclude(p => p.Status)
         );
-        if (result == null)
-        {
+
+        if (userEntity == null)
             return null;
-        }
-        List<ProjectReferenceModel> associatedProjectsReferences = TransformEntitiesToReferenceModels(result.Projects);
-        User user = _userMapper.ToModel(result, associatedProjectsReferences);
+
+        List<ProjectReferenceModel> associatedProjectsReferences = TransformEntitiesToReferenceModels(userEntity.Projects);
+        User user = _userMapper.ToModel(userEntity, associatedProjectsReferences);
         return user;
     }
 
-    public async Task<bool?> UpdateAsync(UpdateUserForm form, User existingUser)
+    public async Task UpdateAsync(UpdateUserForm form, User existingUser)
     {
-        existingUser.FirstName = form.FirstName;
-        existingUser.LastName = form.LastName;
-        existingUser.Email = form.Email;
-        List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(existingUser);
-        var updatedEntity =  _userMapper.ToEntity(existingUser, projects);
-
-        return await _userRepository.UpdateAsync(x => x.Id == existingUser.Id, updatedEntity);
+        await _userRepository.BeginTransactionAsync();
+        try
+        {
+            existingUser.FirstName = form.FirstName;
+            existingUser.LastName = form.LastName;
+            existingUser.Email = form.Email;
+            var updatedEntity = _userMapper.ToEntity(existingUser);
+            await _userRepository.UpdateAsync(x => x.Id == existingUser.Id, updatedEntity);
+            await _userRepository.SaveAsync();
+            await _userRepository.CommitTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await _userRepository.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     public async Task<bool?> DeleteAsync(int id)
     {
-        return await _userRepository.DeleteAsync(x => x.Id == id);
-    }
-
-    private async Task<List<ProjectEntity>> GetAssociatedEntitiesAsync(User userModel)
-    {
-        List<ProjectEntity> projects = [];
-        foreach (var project in userModel.AssociatedProjects)
+        await _userRepository.BeginTransactionAsync();
+        try
         {
-            ProjectEntity projectEntity = await _projectRepository.GetProjectByIdAsync(project.Id);
-            if (projectEntity != null)
-            {
-                projects.Add(projectEntity);
-            }
+            UserEntity? userEntity = await _userRepository.GetAsync(x => x.Id == id);
+            _userRepository.Delete(userEntity!);
+            await _userRepository.SaveAsync();
+            await _userRepository.CommitTransactionAsync();
+            return true;
         }
-
-        return projects;
+        catch (Exception)
+        {
+            await _userRepository.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     private List<ProjectReferenceModel> TransformEntitiesToReferenceModels(ICollection<ProjectEntity> projectEntities)

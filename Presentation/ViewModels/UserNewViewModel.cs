@@ -35,14 +35,10 @@ public partial class UserNewViewModel(IServiceProvider serviceProvider) : Observ
         try
         {
             var userService = _serviceProvider.GetRequiredService<IUserService>();
-            bool? result = await userService.AddAsync(NewUserForm);
-
-            if (result == true)
-            {
-                GoToUserList();
-            }
+            await userService.AddAsync(NewUserForm);
+            GoToUserList();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             FormErrorMessage = "Error: Could not create user.";
         }
@@ -77,7 +73,7 @@ public partial class UserNewViewModel(IServiceProvider serviceProvider) : Observ
         {
             foreach (var error in validationResults)
             {
-                validationErrors.Add(error.ErrorMessage);
+                validationErrors.Add(error.ErrorMessage!);
             }
         }
         FormErrorMessage = string.Join(Environment.NewLine, validationErrors);

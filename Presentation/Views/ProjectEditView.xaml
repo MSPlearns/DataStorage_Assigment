@@ -83,7 +83,7 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <CheckBox IsChecked="{Binding isSelected}" 
-                      Command="{Binding DataContext.ProductSelectionChangedCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                      Command="{Binding DataContext.ProductSelectionChangedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                       CommandParameter="{Binding}" />
                                     <TextBlock Text="{Binding ProductName}" VerticalAlignment="Center" Margin="5,0"/>
                                 </StackPanel>

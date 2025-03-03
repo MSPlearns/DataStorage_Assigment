@@ -45,15 +45,12 @@ public partial class ProductEditViewModel(IServiceProvider serviceProvider) : Ob
         try
         {
             var productService = _serviceProvider.GetRequiredService<IProductService>();
-            bool? result = await productService.UpdateAsync(UpProductForm, CurrentProduct);
+            await productService.UpdateAsync(UpProductForm, CurrentProduct);
 
-            if (result == true)
-            {
-                var productDetailViewModel = _serviceProvider.GetRequiredService<ProductDetailViewModel>();
-                productDetailViewModel.CurrentProduct = await productService.GetByIdAsync(CurrentProduct.Id);
-                var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-                mainViewModel.CurrentViewModel = productDetailViewModel;
-            }
+            var productDetailViewModel = _serviceProvider.GetRequiredService<ProductDetailViewModel>();
+            productDetailViewModel.CurrentProduct = await productService.GetByIdAsync(CurrentProduct.Id);
+            var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+            mainViewModel.CurrentViewModel = productDetailViewModel;
         }
         catch (Exception)
         {

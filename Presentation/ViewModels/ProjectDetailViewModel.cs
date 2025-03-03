@@ -54,7 +54,7 @@ public partial class ProjectDetailViewModel : ObservableObject
 
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
 
-        await projectEditViewModel.UpdateIsSelectedInAvailableProductsAsync();
+        projectEditViewModel.UpdateIsSelectedInAvailableProductsAsync();
         mainViewModel.CurrentViewModel = projectEditViewModel;
     }
 

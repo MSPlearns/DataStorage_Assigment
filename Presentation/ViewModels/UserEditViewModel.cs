@@ -45,16 +45,12 @@ public partial class UserEditViewModel(IServiceProvider serviceProvider) : Obser
         try
         {
         var userService = _serviceProvider.GetRequiredService<IUserService>();
-        bool? result = await userService.UpdateAsync(UpUserForm, CurrentUser);
+        await userService.UpdateAsync(UpUserForm, CurrentUser);
 
-        if (result == true)
-        {
             var userDetailViewModel = _serviceProvider.GetRequiredService<UserDetailViewModel>();
             userDetailViewModel.CurrentUser = await userService.GetByIdAsync(CurrentUser.Id);
             var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
             mainViewModel.CurrentViewModel = userDetailViewModel;
-        }
-
         }
         catch (Exception)
         {

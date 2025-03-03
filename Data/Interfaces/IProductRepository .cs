@@ -4,5 +4,4 @@ namespace Data.Interfaces;
 
 public interface IProductRepository : IBaseRepository<ProductEntity>
 {
-    Task<ProductEntity?> GetProductByIdAsync(int productId);
 }

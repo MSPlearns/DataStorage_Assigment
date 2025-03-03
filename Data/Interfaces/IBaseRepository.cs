@@ -5,10 +5,15 @@ namespace Data.Interfaces;
 
 public interface IBaseRepository<TEntity> where TEntity : class
 {
-    Task<bool> EntityExistsAsync(Expression<Func<TEntity, bool>> expression);
-    Task<bool?> AddAsync(TEntity entity);
-    Task<bool?> DeleteAsync(Expression<Func<TEntity, bool>> expression);
+    Task BeginTransactionAsync();
+    Task CommitTransactionAsync();
+    Task RollbackTransactionAsync();
+
+    Task AddAsync(TEntity entity);
     Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeExpression=null);
     Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> expression, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeExpression = null);
-    Task<bool?> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity);
+    Task UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity);
+    void Delete(TEntity entity);
+    Task<int> SaveAsync();
+    Task<bool> EntityExistsAsync(Expression<Func<TEntity, bool>> expression);
 }

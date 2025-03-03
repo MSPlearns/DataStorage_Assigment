@@ -47,7 +47,7 @@ public partial class CustomerDetailViewModel(IServiceProvider serviceProvider) :
         var selectedProjectModel = await projectService.GetByIdAsync(selectedProjectReference.Id);
 
         var projectDetailViewModel = _serviceProvider.GetRequiredService<ProjectDetailViewModel>();
-        projectDetailViewModel.CurrentProject = selectedProjectModel;
+        projectDetailViewModel.CurrentProject = selectedProjectModel!;
 
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = projectDetailViewModel;

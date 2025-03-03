@@ -1,6 +1,7 @@
 ﻿using Data.Context;
 using Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -11,122 +12,98 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
 
     protected readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
 
+    private IDbContextTransaction _transaction = null!;
+
+    #region Transaction Management
+    public virtual async Task BeginTransactionAsync() 
+    {
+        //Check if a transaction is already in progress
+        //Initiates a new transaction if one is not already in progress
+        _transaction ??= await _context.Database.BeginTransactionAsync();
+    }
+    public virtual async Task CommitTransactionAsync() 
+    {
+        //Checks that there is a transaction active
+        if (_transaction != null)
+        {
+            //Commits the transaction and disposes of it
+            await _transaction.CommitAsync();
+            await _transaction.DisposeAsync();
+            //Reset the transaction
+            _transaction = null!; 
+        }
+    }
+
+    public virtual async Task RollbackTransactionAsync() 
+    {
+        //Checks that there is a transaction active
+        if (_transaction != null)
+        {
+            //Rollbacks the transaction and disposes of it
+            await _transaction.RollbackAsync();
+            await _transaction.DisposeAsync();
+            //Reset the transaction
+            _transaction = null!;
+        }
+    }
+
+    #endregion Transaction Management
+
+
+    #region CRUD Operations
+
     //Create
 
-    public virtual async Task<bool?> AddAsync(TEntity entity)
+    public virtual async Task AddAsync(TEntity entity)
     {
-        if (entity == null)
-            return null!;
-
-        try
-        {
             await _dbSet.AddAsync(entity);
-
-            if(await _context.SaveChangesAsync() == 0)
-                return false;
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error creating {nameof(TEntity)} entity:: {ex.Message}");
-            return false;
-        }
     }
 
     //Read
 
-    //This method returns all entities of type TEntity.
-    //If an includeExpression is provided, it will be used to include related entities.
-    //If no entity is found, it will return an empty list.
-    //for example if I want to get all projects and include the customer entity, I can pass a lambda expression that includes the customer entity
-    public async Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeExpression = null)
+    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeExpression = null)
     {
         IQueryable<TEntity> query = _dbSet;
         if (includeExpression != null)
             query = includeExpression(query);
-        try
-        {
+
             return await query.ToListAsync();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error geting all {nameof(TEntity)} entities:: {ex.Message}");
-            return [];
-        }
+
     }
 
-    //This method searches for an entity that matches the expression and returns it.
-    //If a includedExpression is provided, it will be used to include related entities.
-    //If the entity is not found, it will return null.
-    //for example if I search for a specific proyect by project id and add customer to the include expression, it will return the project with the customer entity
-    public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> expression, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeExpression = null)
+    public virtual async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> expression, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeExpression = null)
     {
        IQueryable<TEntity> query = _dbSet;
         if (includeExpression != null)
             query = includeExpression(query); 
-        try
-        {
         return await query.FirstOrDefaultAsync(expression);
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error geting {nameof(TEntity)} entity:: {ex.Message}");
-            return null;
-        }
     }
 
     //Update
 
-    public async Task<bool?> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
+    public virtual async Task UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
     {
-        if (updatedEntity == null)
-            return null!;
-        try
-        {
-            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression); 
+        //removed null checks - checking in the service layer before calling the repository/DB instead
+            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression);
             if (existingEntity == null)
-                return null!;
+                throw new Exception();
 
             _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
-
-            if (await _context.SaveChangesAsync() == 0)
-                return false;
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error updating {nameof(TEntity)} entity:: {ex.Message}");
-            return false;
-        }
     }
 
     //Delete
-    public async Task<bool?> DeleteAsync(Expression<Func<TEntity, bool>> expression)
+    public virtual void Delete(TEntity entity)
     {
-        if (expression == null)
-            return false;
-
-        try
-        {
-            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression);
-            if (existingEntity == null)
-                return null;
-
-            _dbSet.Remove(existingEntity);
-            if (await _context.SaveChangesAsync() == 0)
-                return false;
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error deleting {nameof(TEntity)} entity:: {ex.Message}");
-            return false;
-        }
+        //removed null checks - checking in the service layer before calling the repository/DB instead
+             _dbSet.Remove(entity);
     }
 
+    //SaveChanges
+    public virtual async Task<int> SaveAsync()
+    {
+        return await _context.SaveChangesAsync();
+    }
+    #endregion CRUD
     public virtual async Task<bool> EntityExistsAsync(Expression<Func<TEntity, bool>> expression)
     {
         return await _dbSet.AnyAsync(expression);

@@ -9,30 +9,36 @@ using System.Linq.Expressions;
 
 namespace Business.Services;
 
-public class CustomerService(ICustomerRepository customerRepository, 
-                             ICustomerFactory customerFactory, 
-                             ICustomerMapper customerMapper, 
-                             IProjectRepository projectRepository,
-                             IProjectMapper projectMapper,
-                             IStatusTypeRepository statusTypeRepository) : ICustomerService
-                             
+public class CustomerService(ICustomerRepository customerRepository,
+                             ICustomerFactory customerFactory,
+                             ICustomerMapper customerMapper,
+                             IProjectMapper projectMapper) : ICustomerService
+
 {
     private readonly ICustomerRepository _customerRepository = customerRepository;
-    private readonly IProjectRepository _projectRepository = projectRepository;
     private readonly ICustomerFactory _customerFactory = customerFactory;
     private readonly ICustomerMapper _customerMapper = customerMapper;
     private readonly IProjectMapper _projectMapper = projectMapper;
 
-    public async Task<bool?> AddAsync(CreateCustomerForm form)
+    public async Task AddAsync(CreateCustomerForm form)
     {
-        Customer customerModel = _customerFactory.FromForm(form);
+        await _customerRepository.BeginTransactionAsync();
+        try
+        {
+            Customer customerModel = _customerFactory.FromForm(form);
 
-        List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(customerModel);
-        CustomerEntity customerEntity = _customerMapper.ToEntity(customerModel, projects);
-        return await _customerRepository.AddAsync(customerEntity);
+            CustomerEntity customerEntity = _customerMapper.ToEntity(customerModel);
+            await _customerRepository.AddAsync(customerEntity);
+            await _customerRepository.SaveAsync();
+
+            await _customerRepository.CommitTransactionAsync();
+        }
+        catch(Exception)
+        {
+            await _customerRepository.RollbackTransactionAsync();
+            throw;
+        }
     }
-
-
 
     public async Task<IEnumerable<Customer>> GetAllAsync()
     {
@@ -59,43 +65,48 @@ public class CustomerService(ICustomerRepository customerRepository,
         );
 
         if (customerEntity == null)
-        {
             return null;
-        }
+
         List<ProjectReferenceModel> associatedProjectsReferences = TransformEntitiesToReferenceModels(customerEntity.Projects);
         Customer customer = _customerMapper.ToModel(customerEntity, associatedProjectsReferences);
         return customer;
     }
 
-    public async Task<bool?> UpdateAsync(UpdateCustomerForm form, Customer existingCustomer)
+    public async Task UpdateAsync(UpdateCustomerForm form, Customer existingCustomer)
     {
-        existingCustomer.CustomerName = form.CustomerName;
+        await _customerRepository.BeginTransactionAsync();
+        try
+        {
+            existingCustomer.CustomerName = form.CustomerName;
 
-       List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(existingCustomer);
-
-        var updatedEntity = _customerMapper.ToEntity(existingCustomer, projects);
-
-        return await _customerRepository.UpdateAsync(x => x.Id == existingCustomer.Id, updatedEntity);
+            var updatedEntity = _customerMapper.ToEntity(existingCustomer);
+            await _customerRepository.UpdateAsync(x => x.Id == existingCustomer.Id, updatedEntity);
+            await _customerRepository.SaveAsync();
+            await _customerRepository.CommitTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await _customerRepository.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     public async Task<bool?> DeleteAsync(int id)
     {
-        return await _customerRepository.DeleteAsync(x => x.Id == id);
-    }
-
-    private async Task<List<ProjectEntity>> GetAssociatedEntitiesAsync(Customer customerModel)
-    {
-        List<ProjectEntity> projects = [];
-        foreach (var project in customerModel.AssociatedProjects)
+        await _customerRepository.BeginTransactionAsync();
+        try
         {
-            ProjectEntity projectEntity = await _projectRepository.GetProjectByIdAsync(project.Id);
-            if (projectEntity != null)
-            {
-                projects.Add(projectEntity);
-            }
+            CustomerEntity? customerEntity = await _customerRepository.GetAsync(x => x.Id == id);
+             _customerRepository.Delete(customerEntity!);
+            await _customerRepository.SaveAsync();
+            await _customerRepository.CommitTransactionAsync();
+            return true;
         }
-
-        return projects;
+        catch (Exception)
+        {
+            await _customerRepository.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     private List<ProjectReferenceModel> TransformEntitiesToReferenceModels(ICollection<ProjectEntity> projectEntities)
@@ -105,12 +116,11 @@ public class CustomerService(ICustomerRepository customerRepository,
         {
             projects.Add(_projectMapper.ToReferenceModel(project));
         }
-
         return projects;
     }
 
     public async Task<bool> AlreadyExists(Expression<Func<CustomerEntity, bool>> predicate)
     {
-       return await _customerRepository.EntityExistsAsync(predicate);
+        return await _customerRepository.EntityExistsAsync(predicate);
     }
 }

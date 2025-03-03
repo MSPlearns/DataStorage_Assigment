@@ -116,12 +116,8 @@ public partial class ProjectNewViewModel : ObservableObject
         try
         {
             var projectService = _serviceProvider.GetRequiredService<IProjectService>();
-            bool? result = await projectService.AddAsync(NewProjectForm);
-
-            if (result == true)
-            {
-                GoToProjectList();
-            }
+            await projectService.AddAsync(NewProjectForm);
+            GoToProjectList();
         }
         catch (Exception)
         {

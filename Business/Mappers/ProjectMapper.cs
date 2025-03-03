@@ -5,17 +5,15 @@ using Domain.Models;
 
 namespace Business.Mappers;
 
-public class ProjectMapper(IUserMapper userMapper, 
-                           IProductMapper productMapper, 
-                           ICustomerMapper customerMapper) 
-    : IProjectMapper
+public class ProjectMapper(IUserMapper userMapper,
+                           ICustomerMapper customerMapper) : IProjectMapper
 {
     private readonly IUserMapper _userMapper = userMapper;
-    private readonly ICustomerMapper _customerMapper= customerMapper;
+    private readonly ICustomerMapper _customerMapper = customerMapper;
 
     public ProjectEntity ToEntity(Project model, List<ProductEntity> productEntities, int statusId)
     {
-        ProjectEntity entity = new() 
+        ProjectEntity entity = new()
         {
             Title = model.Title,
             Description = model.Description,
@@ -32,19 +30,9 @@ public class ProjectMapper(IUserMapper userMapper,
         return entity;
     }
 
-    public ProjectEntity ToEntity(Project model, List<ProductEntity> entities)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Project ToModel(ProjectEntity entity)
-    {
-        throw new NotImplementedException();
-    }
-
     public Project ToModel(ProjectEntity entity, List<ProductReferenceModel> productReferenceModels)
     {
-        
+
         Project project = new()
         {
             Id = entity.Id,
@@ -60,12 +48,8 @@ public class ProjectMapper(IUserMapper userMapper,
         return project;
     }
 
-    public ProjectReferenceModel? ToReferenceModel(ProjectEntity entity)
+    public ProjectReferenceModel ToReferenceModel(ProjectEntity entity)
     {
-        if (entity == null)
-        {
-            return null;
-        }
         return new ProjectReferenceModel
         {
             Id = entity.Id,

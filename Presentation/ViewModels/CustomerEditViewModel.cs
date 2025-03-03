@@ -42,20 +42,16 @@ public partial class CustomerEditViewModel(IServiceProvider serviceProvider) : O
         try
         {
         var customerService = _serviceProvider.GetRequiredService<ICustomerService>();
-        bool? result = await customerService.UpdateAsync(UpCustomerForm, CurrentCustomer);
-
-        if (result == true)
-        {
+        await customerService.UpdateAsync(UpCustomerForm, CurrentCustomer);
+    
             var customerDetailViewModel = _serviceProvider.GetRequiredService<CustomerDetailViewModel>();
             customerDetailViewModel.CurrentCustomer = await customerService.GetByIdAsync(CurrentCustomer.Id);
             var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
             mainViewModel.CurrentViewModel = customerDetailViewModel;
-        }
 
         }
         catch (Exception)
         {
-
             ErrorMessage = "Error: Could not update customer.";
         }
     }

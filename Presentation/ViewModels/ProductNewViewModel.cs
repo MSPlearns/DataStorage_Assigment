@@ -38,12 +38,9 @@ public partial class ProductNewViewModel(IServiceProvider serviceProvider) : Obs
         try
         {
         var productService = _serviceProvider.GetRequiredService<IProductService>();
-        bool? result = await productService.AddAsync(NewProductForm);
-
-        if (result == true)
-        {
-            GoToProductList();
-            }
+        await productService.AddAsync(NewProductForm);
+        GoToProductList();
+            
         }
         catch (Exception)
         {

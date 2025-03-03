@@ -6,19 +6,31 @@ namespace Business.Mappers;
 
 public class ProductMapper : IProductMapper
 {
-    
-    public ProductEntity ToEntity(Product model, List<ProjectEntity> projectEntities)
+
+    public ProductEntity ToEntity(Product model)
     {
         ProductEntity entity = new()
         {
             ProductName = model.ProductName,
             Price = model.Price,
-            Projects = projectEntities
         };
         if (model.Id != default)
             entity.Id = model.Id;
         return entity;
     }
+
+    //public ProductEntity ToEntity(Product model, List<ProjectEntity> projectEntities)
+    //{
+    //    ProductEntity entity = new()
+    //    {
+    //        ProductName = model.ProductName,
+    //        Price = model.Price,
+    //        Projects = projectEntities
+    //    };
+    //    if (model.Id != default)
+    //        entity.Id = model.Id;
+    //    return entity;
+    //}
 
 
     public Product ToModel(ProductEntity entity, List<ProjectReferenceModel> projectReferenceModels)

@@ -6,15 +6,14 @@ namespace Business.Mappers;
 
 public class UserMapper : IUserMapper
 {
-    public  UserEntity ToEntity(User model, List<ProjectEntity> projectEntities)
+    public  UserEntity ToEntity(User model)
     {
         UserEntity entity = new()
         {
             Id = model.Id,
             FirstName = model.FirstName,
             LastName = model.LastName,
-            Email = model.Email,
-            Projects = projectEntities
+            Email = model.Email
         };
         if (model.Id != default)
             entity.Id = model.Id;
@@ -22,6 +21,21 @@ public class UserMapper : IUserMapper
         return entity;
     }
 
+    //public UserEntity ToEntity(User model, List<ProjectEntity> projectEntities)
+    //{
+    //    UserEntity entity = new()
+    //    {
+    //        Id = model.Id,
+    //        FirstName = model.FirstName,
+    //        LastName = model.LastName,
+    //        Email = model.Email,
+    //        Projects = projectEntities
+    //    };
+    //    if (model.Id != default)
+    //        entity.Id = model.Id;
+
+    //    return entity;
+    //}
 
     public User ToModel(UserEntity entity, List<ProjectReferenceModel> projectReferences)
     {

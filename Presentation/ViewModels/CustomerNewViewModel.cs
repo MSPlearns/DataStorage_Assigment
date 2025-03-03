@@ -40,16 +40,11 @@ public partial class CustomerNewViewModel(IServiceProvider serviceProvider) : Ob
         try
         {
             var customerService = _serviceProvider.GetRequiredService<ICustomerService>();
-            bool? result = await customerService.AddAsync(NewCustomerForm);
-
-            if (result == true)
-            {
-                GoToCustomerList();
-            }
+            await customerService.AddAsync(NewCustomerForm);
+            GoToCustomerList();
         }
         catch (Exception)
         {
-
             ErrorMessage = "Error: Could not create customer.";
         }
     }

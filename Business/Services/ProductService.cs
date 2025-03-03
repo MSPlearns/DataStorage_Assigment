@@ -10,21 +10,31 @@ using System.Linq.Expressions;
 
 namespace Business.Services;
 
-public class ProductService(IProductRepository productRepository, IProductFactory productFactory, IProductMapper productMapper, IProjectRepository projectRepository, IProjectMapper projectMapper) : IProductService
+public class ProductService(IProductRepository productRepository,
+                            IProductFactory productFactory,
+                            IProductMapper productMapper,
+                            IProjectMapper projectMapper) : IProductService
 {
     private readonly IProductRepository _productRepository = productRepository;
     private readonly IProductFactory _productFactory = productFactory;
     private readonly IProductMapper _productMapper = productMapper;
-    private readonly IProjectRepository _projectRepository = projectRepository;
     private readonly IProjectMapper _projectMapper = projectMapper;
-    public async Task<bool?> AddAsync(CreateProductForm form)
+    public async Task AddAsync(CreateProductForm form)
     {
-        Product productModel = _productFactory.FromForm(form);
-
-        List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(productModel);
-
-        ProductEntity productEntity = _productMapper.ToEntity(productModel, projects);
-        return await _productRepository.AddAsync(productEntity);
+        await _productRepository.BeginTransactionAsync();
+        try
+        {
+            Product productModel = _productFactory.FromForm(form);
+            ProductEntity productEntity = _productMapper.ToEntity(productModel);
+            await _productRepository.AddAsync(productEntity);
+            await _productRepository.SaveAsync();
+            await _productRepository.CommitTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await _productRepository.RollbackTransactionAsync();
+            throw;
+        }
     }
 
 
@@ -36,7 +46,6 @@ public class ProductService(IProductRepository productRepository, IProductFactor
         .ThenInclude(p => p.Status)
         );
 
-
         foreach (var productEntity in result)
         {
             List<ProjectReferenceModel> associatedProjectReferences = TransformEntitiesToReferenceModels(productEntity.Projects);
@@ -47,53 +56,59 @@ public class ProductService(IProductRepository productRepository, IProductFactor
 
     public async Task<Product?> GetByIdAsync(int id)
     {
-        var productEntity = await _productRepository.GetAsync(
+        ProductEntity? productEntity = await _productRepository.GetAsync(
         x => x.Id == id,
          query => query
         .Include(c => c.Projects)
         .ThenInclude(p => p.Status)
         );
-        if (productEntity == null)
-        {
-            return null;
-        }
-        List<ProjectReferenceModel> associatedProjectReferences = TransformEntitiesToReferenceModels(productEntity.Projects);
 
+        if (productEntity == null)
+            return null;
+
+        List<ProjectReferenceModel> associatedProjectReferences = TransformEntitiesToReferenceModels(productEntity.Projects);
         Product product = _productMapper.ToModel(productEntity, associatedProjectReferences);
         return product;
     }
 
-    public async Task<bool?> UpdateAsync(UpdateProductForm form, Product existingProduct)
+    public async Task UpdateAsync(UpdateProductForm form, Product existingProduct)
     {
-        existingProduct.ProductName = form.ProductName;
-        existingProduct.Price = Decimal.Parse(form.InputPrice);
+        await _productRepository.BeginTransactionAsync();
+        try
+        {
+            existingProduct.ProductName = form.ProductName;
+            existingProduct.Price = Decimal.Parse(form.InputPrice);
 
-
-        List<ProjectEntity> projects = await GetAssociatedEntitiesAsync(existingProduct);
-
-        var updatedEntity = _productMapper.ToEntity(existingProduct, projects);
-
-        return await _productRepository.UpdateAsync(x => x.Id == existingProduct.Id, updatedEntity);
+            var updatedEntity = _productMapper.ToEntity(existingProduct);
+            await _productRepository.UpdateAsync(x => x.Id == existingProduct.Id, updatedEntity);
+            await _productRepository.SaveAsync();
+            await _productRepository.CommitTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await _productRepository.RollbackTransactionAsync();
+            throw;
+        }
     }
     public async Task<bool?> DeleteAsync(int id)
     {
-        return await _productRepository.DeleteAsync(x => x.Id == id);
-    }
-
-    private async Task<List<ProjectEntity>> GetAssociatedEntitiesAsync(Product productModel)
-    {
-        List<ProjectEntity> projects = [];
-        foreach (var project in productModel.AssociatedProjects)
+        await _productRepository.BeginTransactionAsync();
+        try
         {
-            ProjectEntity projectEntity = await _projectRepository.GetProjectByIdAsync(project.Id);
-            if (projectEntity != null)
-            {
-                projects.Add(projectEntity);
-            }
+            ProductEntity? productEntity = await _productRepository.GetAsync(x => x.Id == id);
+             _productRepository.Delete(productEntity!);
+            await _productRepository.SaveAsync();
+            await _productRepository.CommitTransactionAsync();
+            return true;
         }
-
-        return projects;
+        catch (Exception)
+        {
+            await _productRepository.RollbackTransactionAsync();
+            throw;
+        }
     }
+
+
 
     private List<ProjectReferenceModel> TransformEntitiesToReferenceModels(ICollection<ProjectEntity> projectEntities)
     {

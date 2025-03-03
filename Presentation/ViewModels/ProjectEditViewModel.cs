@@ -27,16 +27,16 @@ public partial class ProjectEditViewModel : ObservableObject
     private UpdateProjectForm _upProjectForm = new();
 
     [ObservableProperty]
-    private ObservableCollection<UserReferenceModel> _availableUsers = new();
+    private ObservableCollection<UserReferenceModel> _availableUsers = [];
     [ObservableProperty]
-    private ObservableCollection<CustomerReferenceModel> _availableCustomers = new();
+    private ObservableCollection<CustomerReferenceModel> _availableCustomers = [];
     [ObservableProperty]
-    private ObservableCollection<ProductReferenceModel> _availableProducts = new();
+    private ObservableCollection<ProductReferenceModel> _availableProducts = [];
     [ObservableProperty]
-    private ObservableCollection<String> _availableStatuses = new();
+    private ObservableCollection<String> _availableStatuses = [];
 
     [ObservableProperty]
-    private ObservableCollection<ProductReferenceModel> _selectedProducts = new();
+    private ObservableCollection<ProductReferenceModel> _selectedProducts = [];
     public ProjectEditViewModel(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
@@ -141,24 +141,21 @@ public partial class ProjectEditViewModel : ObservableObject
         try
         {
             var projectService = _serviceProvider.GetRequiredService<IProjectService>();
-            bool? result = await projectService.UpdateAsync(UpProjectForm, CurrentProject);
+            await projectService.UpdateAsync(UpProjectForm, CurrentProject);
 
-            if (result == true)
-            {
-                var projectDetailViewModel = _serviceProvider.GetRequiredService<ProjectDetailViewModel>();
-                projectDetailViewModel.CurrentProject = await projectService.GetByIdAsync(CurrentProject.Id);
-                var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-                mainViewModel.CurrentViewModel = projectDetailViewModel;
-            }
+            var projectDetailViewModel = _serviceProvider.GetRequiredService<ProjectDetailViewModel>();
+            projectDetailViewModel.CurrentProject = await projectService.GetByIdAsync(CurrentProject.Id);
+            var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+            mainViewModel.CurrentViewModel = projectDetailViewModel;
         }
         catch (Exception)
         {
-            ErrorMessage = "Error: Could not create project.";
+            ErrorMessage = "Error: Could not update project.";
 
         }
     }
 
-    private void SyncSelectedProducts()
+    private async Task SyncSelectedProducts()
     {
         foreach (var product in AvailableProducts)
         {
@@ -223,7 +220,7 @@ public partial class ProjectEditViewModel : ObservableObject
         {
             foreach (var error in validationResults)
             {
-                validationErrors.Add(error.ErrorMessage); //validation method result  Error Message not the class ErrorMessage
+                validationErrors.Add(error.ErrorMessage!); //validation method result  Error Message not the class ErrorMessage
             }
         }
         ErrorMessage = string.Join(Environment.NewLine, validationErrors);

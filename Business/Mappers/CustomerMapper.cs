@@ -7,12 +7,24 @@ namespace Business.Mappers;
 public class CustomerMapper : ICustomerMapper
 {
 
-    public CustomerEntity ToEntity(Customer model, List<ProjectEntity> projectEntities)
+    //public CustomerEntity ToEntity(Customer model, List<ProjectEntity> projectEntities)
+    //{
+    //    CustomerEntity entity = new()
+    //    {
+    //        CustomerName = model.CustomerName,
+    //        Projects = projectEntities
+    //    };
+
+    //    if (model.Id != default)
+    //        entity.Id = model.Id;
+
+    //    return entity;
+    //}
+    public CustomerEntity ToEntity(Customer model)
     {
         CustomerEntity entity = new()
         {
             CustomerName = model.CustomerName,
-            Projects = projectEntities
         };
 
         if (model.Id != default)

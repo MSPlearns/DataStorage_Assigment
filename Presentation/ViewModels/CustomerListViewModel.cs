@@ -48,7 +48,7 @@ public partial class CustomerListViewModel : ObservableObject
         var selectedCustomerModel = await customerService.GetByIdAsync(selectedCustomerReference.Id);
 
         var customerDetailViewModel = _serviceProvider.GetRequiredService<CustomerDetailViewModel>();
-        customerDetailViewModel.CurrentCustomer = selectedCustomerModel;
+        customerDetailViewModel.CurrentCustomer = selectedCustomerModel!;
 
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = customerDetailViewModel;
